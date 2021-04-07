@@ -1,2 +1,2 @@
-# HCI_scratterplot
-HCI_scratterplot
+# HCI_Scratterplot
+HCI_Scratterplot
