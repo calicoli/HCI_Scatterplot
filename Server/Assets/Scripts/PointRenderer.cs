@@ -102,6 +102,8 @@ public class PointRenderer : MonoBehaviour {
         yMax = FindMaxValue(yColumnName);
         zMax = FindMaxValue(zColumnName);
 
+        // Debug.Log(xMax + " " + yMax + " " + zMax); // Write to console
+
         // Get minimums of each axis, using FindMinValue method defined below
         xMin = FindMinValue(xColumnName);
         yMin = FindMinValue(yColumnName);
