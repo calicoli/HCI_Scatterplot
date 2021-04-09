@@ -7,19 +7,67 @@ using UnityEngine.UI;
 public class SelectProcessor : MonoBehaviour
 {
     public GameObject ballController;
+    public GameObject renderProcessor;
     public Text pointText;
     public GameObject orthCamera;
+    public GameObject frameThisDevice, frameOtherDevice;
 
-    private GameObject objLine;
+    public GameObject testCube;
+
+    private GameObject connectingPointsLine;
     private LineRenderer lrLine;
     private const float lineWidth = 0.1f;
+
+    public GameObject tetraContainer;
+    private GameObject[] triTetra = new GameObject[4];
+    private MeshRenderer[] mrTetra = new MeshRenderer[4];
+    private MeshFilter[] mfTetra = new MeshFilter[4];
+    private GameObject edgeTetra;
+    private LineRenderer lrEdgeTetra;
+    private Bounds boundTetra;
+
+    public GameObject objOrigin, objXEnd, objYEnd, objZEnd;
+    private Vector3 posOrigin, posXEnd, posYEnd, posZEnd;
+    private Vector3 upposSharedEdge, dnposSharedEdge,
+                    upposThisFrameEdge, dnposThisFrameEdge,
+                    upposOtherFrameEdge, dnposOtherFrameEdge;
+
+    private Vector2 tpPrevTs1, tpPrevTs2, tpPrevTs3;
 
     // Start is called before the first frame update
     void Start()
     {
-        objLine = new GameObject("ConnetingLine");
-        objLine.transform.SetParent(this.transform);
-        lrLine = objLine.AddComponent<LineRenderer>();
+        tpPrevTs1 = tpPrevTs2 = tpPrevTs3 = Vector2.zero;
+        posOrigin = objOrigin.transform.position;
+        initConnectingLine();
+        initTetra();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        updateAnchorPosition();
+    }
+
+    void updateAnchorPosition()
+    {
+        posOrigin = objOrigin.transform.position;
+        posXEnd = objXEnd.transform.position;
+        posYEnd = objYEnd.transform.position;
+        posZEnd = objZEnd.transform.position;
+        upposSharedEdge = frameOtherDevice.GetComponent<FrameController>().lineRenderer.GetPosition(3);
+        dnposSharedEdge = frameOtherDevice.GetComponent<FrameController>().lineRenderer.GetPosition(0);
+        upposOtherFrameEdge = frameOtherDevice.GetComponent<FrameController>().lineRenderer.GetPosition(2);
+        dnposOtherFrameEdge = frameOtherDevice.GetComponent<FrameController>().lineRenderer.GetPosition(1);
+        upposThisFrameEdge = frameThisDevice.GetComponent<FrameController>().lineRenderer.GetPosition(1);
+        dnposThisFrameEdge = frameThisDevice.GetComponent<FrameController>().lineRenderer.GetPosition(0);
+    }
+
+    void initConnectingLine()
+    {
+        connectingPointsLine = new GameObject("ConnetingLine");
+        connectingPointsLine.transform.SetParent(this.transform);
+        lrLine = connectingPointsLine.AddComponent<LineRenderer>();
         lrLine.startWidth = lrLine.endWidth = lineWidth;
         //lrLine.useWorldSpace = false;
         lrLine.material = new Material(Shader.Find("Sprites/Default"));
@@ -27,12 +75,165 @@ public class SelectProcessor : MonoBehaviour
         lrLine.enabled = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    void initTetra()
     {
-        
+        // tris
+        for(int i = 0; i < 4; i++)
+        {
+            triTetra[i] = tetraContainer.transform.GetChild(i).gameObject;
+            mrTetra[i] = triTetra[i].GetComponent<MeshRenderer>();
+            mfTetra[i] = triTetra[i].GetComponent<MeshFilter>();
+
+            renderProcessor.GetComponent<RenderProcessor>().initMeshRenderer(mrTetra[i]);
+            mrTetra[i].material.color = new Color32(0, 0, 255, 100);
+        }
+        // edge
+        edgeTetra = tetraContainer.transform.GetChild(4).gameObject;
+        lrEdgeTetra = edgeTetra.GetComponent<LineRenderer>();
+        renderProcessor.GetComponent<RenderProcessor>().initLineRenderer(lrEdgeTetra);
+        lrEdgeTetra.material.color = new Color32(0, 0, 255, 100);
+
+        // tetra
+        tetraContainer.GetComponent<MeshRenderer>().enabled = false;
+        tetraContainer.GetComponent<MeshRenderer>().material.color = new Color32(0, 0, 255, 100);
+        RedrawTetra(posOrigin, posOrigin, posOrigin);
     }
 
+    public void ProcessorTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
+    {
+        if(tp1 == tpPrevTs1 && tp2 == tpPrevTs2 && tp3 == tpPrevTs3)
+        {
+            return;
+        } else
+        {
+            tpPrevTs1 = tp1;
+            tpPrevTs2 = tp2;
+            tpPrevTs3 = tp3;
+        }
+        Vector3 p1, p2, p3;
+        if(cntServer == 1)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processClientTouchPoint(tp2);
+            p3 = processClientTouchPoint(tp3);
+        }
+        else if(cntServer == 2)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            p3 = processClientTouchPoint(tp3);
+        }
+        else if(cntServer == 3)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            p3 = processServerTouchPoint(tp3);
+        }
+        else
+        {
+            p1 = p2 = p3 = Vector3.zero;
+        }
+        RedrawTetra(p1, p2, p3);
+        RedrawTetraEdge(p1, p2, p3);
+        //DetectTetraIntersecting();
+
+    }
+
+    void DetectTetraIntersecting()
+    {
+        //boundTetra = tetraContainer.GetComponent<MeshFilter>().mesh.bounds;
+        boundTetra = tetraContainer.GetComponent<MeshRenderer>().bounds;
+        Bounds boundBall;
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        bool isIntersecting;
+        int cntTetraSelect = 0;
+        bool cntValid = false;
+        for (int idx = 0; idx < cntBall; idx++)
+        {
+            boundBall = ballController.GetComponent<BallController>().balls[idx].bound;
+            //isIntersecting = boundBall.Intersects(boundTetra);
+            isIntersecting = boundTetra.Intersects(boundBall);
+            if(isIntersecting)
+            {
+                ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, true, out cntValid);
+                cntTetraSelect = cntValid ? cntTetraSelect + 1 : cntTetraSelect;
+            } else
+            {
+                ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, false, out cntValid);
+            }
+        }
+        Debug.Log("dy4- ball number in tetraRange: " + cntTetraSelect);
+        ballController.GetComponent<BallController>().UpdateBallVisulization();
+
+        //Bounds boundCube = testCube.GetComponent<MeshFilter>().mesh.bounds;
+        Bounds boundCube = testCube.GetComponent<MeshRenderer>().bounds;
+        if (boundTetra.Intersects(boundCube)) {
+            testCube.GetComponent<MeshRenderer>().material.color = Color.red;
+        } else
+        {
+            testCube.GetComponent<MeshRenderer>().material.color = Color.white;
+        }
+    }
+
+    void RedrawTetraEdge(Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3[] vars = {
+            p1, p2, p3, p1,
+            posOrigin, p2, posOrigin, p3
+        };
+        //renderProcessor.GetComponent<RenderProcessor>().updateLine(true, vars.Length, vars, out lrEdgeTetra);
+        lrEdgeTetra.positionCount = vars.Length;
+        for (int i = 0; i < vars.Length; i++)
+        {
+            lrEdgeTetra.SetPosition(i, vars[i]);
+        }
+    }
+
+    void RedrawTetra(Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3[] varr0 = { posOrigin, p1, p2 };
+        Vector3[] varr1 = { posOrigin, p1, p3 };
+        Vector3[] varr2 = { posOrigin, p2, p3 };
+        Vector3[] varr3 = { p1, p2, p3 };
+
+        Mesh mesh = new Mesh();
+        renderProcessor.GetComponent<RenderProcessor>().updateTri(true, varr0, out mesh);
+        mesh.name = "tetra-tri1";
+        mfTetra[0].mesh = mesh;
+        renderProcessor.GetComponent<RenderProcessor>().updateTri(true, varr1, out mesh);
+        mesh.name = "tetra-tri2";
+        mfTetra[1].mesh = mesh;
+        renderProcessor.GetComponent<RenderProcessor>().updateTri(true, varr2, out mesh);
+        mesh.name = "tetra-tri3";
+        mfTetra[2].mesh = mesh;
+        renderProcessor.GetComponent<RenderProcessor>().updateTri(true, varr3, out mesh);
+        mesh.name = "tetra-tri4";
+        mfTetra[3].mesh = mesh;
+
+        CombineInstance[] combineInstances = new CombineInstance[4];
+        for (int i = 0; i < 4; i++) 
+        {
+            combineInstances[i].mesh = mfTetra[i].sharedMesh;                        //将共享mesh，赋值
+            combineInstances[i].transform = mfTetra[i].transform.localToWorldMatrix; //本地坐标转矩阵，赋值
+        }
+        Mesh tetraMesh = new Mesh();
+        tetraMesh.CombineMeshes(combineInstances);
+        tetraMesh.name = "tetra";
+        tetraContainer.GetComponent<MeshFilter>().mesh = tetraMesh;
+        tetraContainer.GetComponent<MeshCollider>().sharedMesh = tetraContainer.GetComponent<MeshFilter>().mesh;
+    }
+
+    public void showTetra(bool flag)
+    {
+        /*
+        for(int i = 0; i < 4; i++)
+        {
+            mrTetra[i].enabled = flag;
+        }
+        */
+        lrEdgeTetra.enabled = flag;
+        tetraContainer.GetComponent<MeshRenderer>().enabled = flag;
+    }
 
     public void DetectRaycastOnBallwithNewRaycast(int num, Vector2 v1, Vector2 v2)
     {
@@ -40,7 +241,7 @@ public class SelectProcessor : MonoBehaviour
         Vector3 vstart = Vector3.zero, vend = Vector3.zero;
         Vector3[] result = { Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero };
         string ballInfo;
-        Vector3 p1 = processTouchPoint(v1), p2 = processTouchPoint(v2);
+        Vector3 p1 = processServerTouchPoint(v1), p2 = processServerTouchPoint(v2);
         Vector3 posCamera = Camera.main.gameObject.transform.position;
         float cameraHeight = orthCamera.GetComponent<CameraController>().curCameraHeight;
         if (num == 1)
@@ -90,7 +291,6 @@ public class SelectProcessor : MonoBehaviour
         UpdateConnectingLine(flagRenderLine, vstart, vend);
     }
 
-    
     public void DetectRaycastOnBallwithNativeRaycast(int num, Vector2 v1, Vector2 v2)
     {
         bool flagRenderLine = false;
@@ -140,15 +340,33 @@ public class SelectProcessor : MonoBehaviour
         UpdateConnectingLine(flagRenderLine, vstart, vend);
     }
 
-    private Vector3 processTouchPoint(Vector2 v)
+    private Vector3 processServerTouchPoint(Vector2 v)
     {
-        float cameraOrthSize = orthCamera.GetComponent<CameraController>().curCameraOrthSize;
-        Vector3 v1 = Vector3.zero;
-        v1.x = v.x - Screen.width / 2;
-        v1.y = v.y - Screen.height / 2;
-        v1 = v1 * (cameraOrthSize / (Screen.height / 2));
-        return v1;
+        //float cameraOrthSize = orthCamera.GetComponent<CameraController>().curCameraOrthSize;
+        float cameraHeight = orthCamera.GetComponent<CameraController>().curCameraHeight;
+        Vector3 rv = Vector3.zero;
+        rv.x = v.x - Screen.width / 2;
+        rv.y = v.y - Screen.height / 2;
+        //Debug.Log("dy4 - v: " + v);
+        //Debug.Log("dy4 - rv0: " + rv);
+        //rv = rv * (cameraOrthSize / (Screen.height / 2));
+        rv = rv * (cameraHeight / Screen.height);
+        //Debug.Log("dy4 - rv1: " + rv);
+        return rv;
     }
+
+    private Vector3 processClientTouchPoint(Vector2 v)
+    {
+        Vector3 tv = processServerTouchPoint(v);
+        Vector3 rv = Vector3.zero;
+        rv.x = posOrigin.x;
+        //rv.y = v.y - Screen.height / 2;
+        //rv.z = posOrigin.z + v.x * (posZEnd.z - posOrigin.z) - Screen.width;
+        rv.y = tv.y;
+        rv.z = upposSharedEdge.z + (tv.x - upposThisFrameEdge.x);
+        return rv;
+    }
+
     public void UpdateConnectingLine(bool flag, Vector3 v1, Vector3 v2)
     {
         lrLine.enabled = flag;
@@ -158,5 +376,5 @@ public class SelectProcessor : MonoBehaviour
             lrLine.SetPosition(1, v2);
         }
     }
-    
+
 }

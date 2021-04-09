@@ -41,7 +41,8 @@ public class TouchProcessor : MonoBehaviour
     [HideInInspector]
     public Vector3 vertex1, vertex2;
     [HideInInspector]
-    public bool isTetraSelectingInServer, isTetraSelectingInClient;
+    //public bool isTetraSelectingInServer, isTetraSelectingInClient;
+    public int cntTetraSelectingInServer, cntTetraSelectingInClient;
 
     [HideInInspector]
 	public bool isPanning, isRotating, isLocked;
@@ -100,8 +101,6 @@ public class TouchProcessor : MonoBehaviour
         screenHeight = Screen.height;
         //Debug.Log("ScreenHeight: " + screenHeight + "; ScreenWidth: " + screenWidth);
 
-
-        Debug.Log("dy4- localRotation: " + obj.name);
         pos = defaultPos = new Vector3(0, 0, 0);
         //rot = defaultRot = Quaternion.Euler(Vector3.zero);
         rot = defaultRot = obj.transform.Find("Scatterplot").transform.localRotation;
@@ -181,22 +180,62 @@ public class TouchProcessor : MonoBehaviour
     #region TetraSelection
     public void detectTetraSelect()
     {
-        if (Input.touchCount == 1)
+        cntTetraSelectingInServer = Input.touchCount;
+        cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
+        if(cntTetraSelectingInServer > 0
+            && cntTetraSelectingInServer + cntTetraSelectingInClient == 3)
         {
-            Touch t = Input.touches[0];
-
-            selectProcessor.GetComponent<SelectProcessor>().
-                DetectRaycastOnBallwithNewRaycast(1, t.position, Vector2.zero);
+            if(cntTetraSelectingInServer == 1)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.position.y > 600)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessorTetraSelect(1, 
+                        touch.position, 
+                        new Vector2(screenWidth / 3, 2 * screenHeight / 3), 
+                        new Vector2(3 * screenWidth / 4, screenHeight / 2));
+                    
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+                Debug.Log("dy6- tp: " + touch.position);
+            }
+            else if(cntTetraSelectingInServer == 2)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                if(touch1.position.y > 600 && touch2.position.y > 600)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessorTetraSelect(2, 
+                        touch1.position, 
+                        touch2.position, 
+                        new Vector2(screenWidth - 150, screenHeight / 2 - 50));
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+                
+            }
+            else if(cntTetraSelectingInServer == 3)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                Touch touch3 = Input.touches[2];
+                if (touch1.position.y > 600 && touch2.position.y > 600 && touch3.position.y > 600)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessorTetraSelect(3, touch1.position, touch2.position, touch3.position);
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+                
+            }
+            
         }
-        else if (Input.touchCount == 2)
+        /*else
         {
-            Touch t1 = Input.touches[0], t2 = Input.touches[1];
-            selectProcessor.GetComponent<SelectProcessor>().
-                DetectRaycastOnBallwithNewRaycast(2, t1.position, t2.position);
-        }
+            selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
+        }*/
     }
     #endregion
-
 
     #region CastRaySelect includng detectRenderedSelect()
 
@@ -453,14 +492,14 @@ public class TouchProcessor : MonoBehaviour
     }
 
     private Vector3 processTouchPoint(Vector3 v) {
-        cameraOrthSize = orthCamera.GetComponent<CameraController>().curCameraOrthSize;
-        //cameraHeight = orthCamera.GetComponent<CameraController>().curCameraHeight;
+        //cameraOrthSize = orthCamera.GetComponent<CameraController>().curCameraOrthSize;
+        cameraHeight = orthCamera.GetComponent<CameraController>().curCameraHeight;
         //cameraWidth = orthCamera.GetComponent<CameraController>().curCameraWidth;
         Vector3 v1 = Vector3.zero;
         v1.x = v.x - screenWidth / 2;
         v1.y = v.y - screenHeight / 2;
-        v1 = v1 * (cameraOrthSize / (screenHeight / 2));
-        //v1.z = orthCamera.GetComponent<CameraController>().curCameraNearClipPlane;
+        // v1 = v1 * (cameraOrthSize / (screenHeight / 2));
+        v1 = v1 * (cameraHeight / Screen.height);
         return v1;
 	}
 
@@ -477,7 +516,7 @@ public class TouchProcessor : MonoBehaviour
         return currentMode;
     }
 
-    #region Enter filtering1/filtering2/selection/navigation Mode
+    #region Enter filtering/selection/navigation Mode
     public void enterFiltering1Mode()
     {
         charMode = '1';

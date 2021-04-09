@@ -24,6 +24,7 @@ public class BallController : MonoBehaviour
         public Color defaultColor;
         public Color selectedColor;
         public Color filteredColor;
+        public Bounds bound;
     }
 
     [HideInInspector]
@@ -66,6 +67,19 @@ public class BallController : MonoBehaviour
             {
                 pointContainer.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = balls[i].defaultColor;
             }
+        }
+    }
+
+    public void UpdateTetraBallWithID(int idx, bool inRange, out bool flag)
+    {
+        if (!balls[idx].isFiltered && inRange)
+        {
+            balls[idx].isSelected = true;
+            flag = true;
+        } else
+        {
+            balls[idx].isSelected = false;
+            flag = false;
         }
     }
 
@@ -127,7 +141,6 @@ public class BallController : MonoBehaviour
         switch(axis)
         {
             case 'x':
-                //Debug.Log("dy-case x: " + minn + ',' + maxx);
                 for (int i = 0; i < ballCount; i++)
                 {
                     if (balls[i].oriPosition.x < minn || balls[i].oriPosition.x > maxx)
@@ -268,6 +281,8 @@ public class BallController : MonoBehaviour
                 -balls[i].oriPosition.z,
                 balls[i].oriPosition.y,
                 balls[i].oriPosition.x);
+            //balls[i].bound = pointContainer.transform.GetChild(i).GetComponent<MeshFilter>().mesh.bounds;
+            balls[i].bound = pointContainer.transform.GetChild(i).GetComponent<MeshRenderer>().bounds;
         }
     }
 
@@ -391,7 +406,6 @@ public class BallController : MonoBehaviour
         switch(axis)
         {
             case 'x':
-                //Debug.Log("dy-case x: " + minn + ',' + maxx);
                 for (int i = 0; i < ballCount; i++)
                 {
                     if (balls[i].curPosition.x < minn || balls[i].curPosition.x > maxx)
