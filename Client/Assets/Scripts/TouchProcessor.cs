@@ -37,6 +37,10 @@ public class TouchProcessor : MonoBehaviour
     public bool isClientSelecting;
     [HideInInspector]
     public bool isClientFiltering, isServerFiltering;
+    [HideInInspector]
+    public int cntTetraOrDiamSelectingInClient;
+    [HideInInspector]
+    public Vector2 tpTetraOrDiamSelect1, tpTetraOrDiamSelect2;
 
     private float panTimer;
     private float rotateTimer;
@@ -87,11 +91,17 @@ public class TouchProcessor : MonoBehaviour
         sca = obj.transform.Find("Scatterplot").transform.localScale;
         defaultScale = obj.transform.Find("Scatterplot").transform.localScale;
 
-        modeSelect = isClientSelecting = false;
+        //modeSelect = isClientSelecting = false;
+        isClientSelecting = false;
         selectOffset = selectDepth = 0f;
 
-        modeFilter1 = modeFilter2 = isClientFiltering = isServerFiltering = false;
+        //modeFilter1 = modeFilter2 = false;
+        isClientFiltering = isServerFiltering = false;
         lowerFilterDelta = upperFilterDelta = 0f;
+
+        // tetra select
+        cntTetraOrDiamSelectingInClient = 0;
+        tpTetraOrDiamSelect1 = tpTetraOrDiamSelect2 = Vector2.zero;
 
         isLocked = isPanning = isRotating = false;
         modeText.text = "Mode: Navigation";
@@ -125,8 +135,43 @@ public class TouchProcessor : MonoBehaviour
         } else if(charMode == '2')
         {
             detectFilter2();
+        } else if(charMode == 't')
+        {
+            detectTetraSelect();
         }
 	}
+
+    private void detectTetraSelect()
+    {
+        int cntValidTouch = 0;
+        tpTetraOrDiamSelect1 = tpTetraOrDiamSelect2 = Vector2.zero;
+        if (Input.touchCount > -1 && Input.touchCount < 3)
+        {
+            if (Input.touchCount == 1)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.position.y > 600 && touch.position.y < screenHeight - 500)
+                {
+                    tpTetraOrDiamSelect1 = touch.position;
+                    cntValidTouch = 1;
+                }
+            }
+            else if (Input.touchCount == 2)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                if (touch1.position.y > 600 && touch1.position.y < screenHeight - 500 &&
+                   touch2.position.y > 600 && touch2.position.y < screenHeight - 500)
+                {
+                    tpTetraOrDiamSelect1 = touch1.position;
+                    tpTetraOrDiamSelect2 = touch2.position;
+                    cntValidTouch = 2;
+                }
+            }
+        }
+        cntTetraOrDiamSelectingInClient = cntValidTouch;
+        sender.GetComponent<ClientController>().sendMessage();
+    }
 
     private void detectFilter1()
     {
@@ -342,36 +387,48 @@ public class TouchProcessor : MonoBehaviour
         {
             case 'n':
                 modeText.text = ("Mode: Navigation");
-                modeFilter1 = false; modeNavigate = true;
-                modeFilter2 = false; modeSelect = false;
+                //modeFilter1 = false; modeNavigate = true;
+                //modeFilter2 = false; modeSelect = false;
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(false);
                 break;
             case '1':
-                modeText.text = ("Mode: Filter 1");
-                modeFilter1 = true; modeNavigate = false;
-                modeFilter2 = false; modeSelect = false;
+                modeText.text = ("Mode: Filtering 1");
+                //modeFilter1 = true; modeNavigate = false;
+                //modeFilter2 = false; modeSelect = false;
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(true);
                 break;
             case '2':
-                modeText.text = ("Mode: Filter 2");
-                modeFilter1 = false; modeNavigate = false;
-                modeFilter2 = true; modeSelect = false;
+                modeText.text = ("Mode: Filtering 2");
+                //modeFilter1 = false; modeNavigate = false;
+                //modeFilter2 = true; modeSelect = false;
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(true);
                 break;
-            case 's':
-                modeText.text = ("Mode: Select");
-                modeFilter1 = false; modeNavigate = false;
-                modeFilter2 = false; modeSelect = true;
+            case 'r':
+                modeText.text = ("Mode: Select R");
+                //modeFilter1 = false; modeNavigate = false;
+                //modeFilter2 = false; modeSelect = true;
+                isClientFiltering = false; isClientSelecting = false;
+                zSlider.SetActive(false);
+                break;
+            case 'p':
+                modeText.text = ("Mode: Selection P");
+                //modeFilter1 = false; modeNavigate = false;
+                //modeFilter2 = false; modeSelect = true;
+                isClientFiltering = false; isClientSelecting = false;
+                zSlider.SetActive(false);
+                break;
+            case 't':
+                modeText.text = "Mode: Selection T";
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(false);
                 break;
             default:
                 modeText.text = ("Mode: error");
-                modeFilter1 = false; modeNavigate = false;
-                modeFilter2 = false; modeSelect = false;
+                //modeFilter1 = false; modeNavigate = false;
+                //modeFilter2 = false; modeSelect = false;
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(false);
                 break;

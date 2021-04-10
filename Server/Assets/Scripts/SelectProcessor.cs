@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SelectProcessor : MonoBehaviour
 {
     public GameObject ballController;
+    public GameObject pointContainer;
     public GameObject renderProcessor;
     public Text pointText;
     public GameObject orthCamera;
@@ -25,6 +26,8 @@ public class SelectProcessor : MonoBehaviour
     private GameObject edgeTetra;
     private LineRenderer lrEdgeTetra;
     private Bounds boundTetra;
+    private int cntBallTetraSelect;
+    private bool ballEnableInteractScript;
 
     public GameObject objOrigin, objXEnd, objYEnd, objZEnd;
     private Vector3 posOrigin, posXEnd, posYEnd, posZEnd;
@@ -41,6 +44,8 @@ public class SelectProcessor : MonoBehaviour
         posOrigin = objOrigin.transform.position;
         initConnectingLine();
         initTetra();
+        cntBallTetraSelect = 0;
+        ballEnableInteractScript = false;
     }
 
     // Update is called once per frame
@@ -92,11 +97,18 @@ public class SelectProcessor : MonoBehaviour
         lrEdgeTetra = edgeTetra.GetComponent<LineRenderer>();
         renderProcessor.GetComponent<RenderProcessor>().initLineRenderer(lrEdgeTetra);
         lrEdgeTetra.material.color = new Color32(0, 0, 255, 100);
+        lrEdgeTetra.startWidth = lrEdgeTetra.endWidth = 0.05f;
 
         // tetra
         tetraContainer.GetComponent<MeshRenderer>().enabled = false;
         tetraContainer.GetComponent<MeshRenderer>().material.color = new Color32(0, 0, 255, 100);
-        RedrawTetra(posOrigin, posOrigin, posOrigin);
+        RedrawTetra(posOrigin, posOrigin+Vector3.left, posOrigin + Vector3.back);
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        for(int i=0; i< cntBall; i++)
+        {
+            pointContainer.transform.GetChild(i).GetComponent<BoundsIntersectExample>().
+                meshCollider = tetraContainer.GetComponent<MeshCollider>();
+        }
     }
 
     public void ProcessorTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
@@ -136,7 +148,58 @@ public class SelectProcessor : MonoBehaviour
         RedrawTetra(p1, p2, p3);
         RedrawTetraEdge(p1, p2, p3);
         //DetectTetraIntersecting();
+        if(!ballEnableInteractScript)
+        {
+            AddBoundsIntersectScriptonBall();
+        }
+        DetectTetraRayIntersecting();
 
+    }
+
+    void AddBoundsIntersectScriptonBall()
+    {
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(true);
+    }
+
+    void DetectTetraRayIntersecting()
+    {
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        int cntInTetra = 0;
+        for(int i = 0; i< cntBall; i++)
+        {
+            bool inTetra = pointContainer.transform.GetChild(i).GetComponent<BoundsIntersectExample>().In;
+            bool valid;
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(i, inTetra, out valid);
+            if (valid)
+            {
+                cntInTetra++;
+            } else
+            {
+                cntInTetra--;
+            }
+        }
+        ballController.GetComponent<BallController>().UpdateBallVisulization();
+        pointText.text = "Tetra select point number: " + cntBallTetraSelect;          
+    }
+
+    public void DetectTetraTrigger(bool enterTrigger, int idx) 
+    {
+        bool valid;
+        if (enterTrigger)
+        {
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, true, out valid);
+            if(valid)
+            {
+                cntBallTetraSelect++;
+            }
+        } else
+        {
+            Debug.Log("exit following1 function");
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, false, out valid);
+            cntBallTetraSelect--;
+        }
+        //ballController.GetComponent<BallController>().UpdateBallVisulization();
+        pointText.text = "Tetra select point number: " + cntBallTetraSelect;
     }
 
     void DetectTetraIntersecting()
@@ -219,8 +282,11 @@ public class SelectProcessor : MonoBehaviour
         Mesh tetraMesh = new Mesh();
         tetraMesh.CombineMeshes(combineInstances);
         tetraMesh.name = "tetra";
-        tetraContainer.GetComponent<MeshFilter>().mesh = tetraMesh;
-        tetraContainer.GetComponent<MeshCollider>().sharedMesh = tetraContainer.GetComponent<MeshFilter>().mesh;
+        if(tetraMesh)
+        {
+            tetraContainer.GetComponent<MeshFilter>().mesh = tetraMesh;
+            tetraContainer.GetComponent<MeshCollider>().sharedMesh = tetraMesh;
+        }
     }
 
     public void showTetra(bool flag)
@@ -233,6 +299,10 @@ public class SelectProcessor : MonoBehaviour
         */
         lrEdgeTetra.enabled = flag;
         tetraContainer.GetComponent<MeshRenderer>().enabled = flag;
+        if(!flag)
+        {
+            pointText.text = null;
+        }
     }
 
     public void DetectRaycastOnBallwithNewRaycast(int num, Vector2 v1, Vector2 v2)
@@ -347,6 +417,7 @@ public class SelectProcessor : MonoBehaviour
         Vector3 rv = Vector3.zero;
         rv.x = v.x - Screen.width / 2;
         rv.y = v.y - Screen.height / 2;
+        rv.z = posOrigin.z;
         //Debug.Log("dy4 - v: " + v);
         //Debug.Log("dy4 - rv0: " + rv);
         //rv = rv * (cameraOrthSize / (Screen.height / 2));

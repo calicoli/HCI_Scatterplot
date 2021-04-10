@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 33490470698715024}
   - component: {fileID: 135641241447448184}
   - component: {fileID: 23674384927843666}
+  - component: {fileID: -2285883544807104659}
   m_Layer: 0
   m_Name: DataBall
   m_TagString: Untagged
@@ -93,3 +94,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &-2285883544807104659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1103527760695654}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f2e78fb160b1a4ca6abe1e621e0944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshCollider: {fileID: 0}
+  In: 0
+  concaveHull: 0
+  distance: 100

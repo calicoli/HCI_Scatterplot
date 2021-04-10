@@ -43,6 +43,8 @@ public class TouchProcessor : MonoBehaviour
     [HideInInspector]
     //public bool isTetraSelectingInServer, isTetraSelectingInClient;
     public int cntTetraSelectingInServer, cntTetraSelectingInClient;
+    [HideInInspector]
+    public Vector2 tpTetraInClient1, tpTetraInClient2;
 
     [HideInInspector]
 	public bool isPanning, isRotating, isLocked;
@@ -181,36 +183,39 @@ public class TouchProcessor : MonoBehaviour
     public void detectTetraSelect()
     {
         cntTetraSelectingInServer = Input.touchCount;
-        cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
+        //cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
         if(cntTetraSelectingInServer > 0
             && cntTetraSelectingInServer + cntTetraSelectingInClient == 3)
         {
             if(cntTetraSelectingInServer == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 600)
+                if (touch.position.y > 600 && touch.position.y < screenHeight - 500)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
-                        ProcessorTetraSelect(1, 
-                        touch.position, 
-                        new Vector2(screenWidth / 3, 2 * screenHeight / 3), 
-                        new Vector2(3 * screenWidth / 4, screenHeight / 2));
-                    
+                        ProcessorTetraSelect(1,
+                        touch.position,
+                        tpTetraInClient1,
+                        tpTetraInClient2);
+                        //new Vector2(screenWidth / 3, 2 * screenHeight / 3), 
+                        //new Vector2(3 * screenWidth / 4, screenHeight / 2));
+
                     selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
                 }
-                Debug.Log("dy6- tp: " + touch.position);
             }
             else if(cntTetraSelectingInServer == 2)
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if(touch1.position.y > 600 && touch2.position.y > 600)
+                if(touch1.position.y > 600 && touch1.position.y < screenHeight - 500 &&
+                   touch2.position.y > 600 && touch2.position.y < screenHeight - 500)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
-                        ProcessorTetraSelect(2, 
-                        touch1.position, 
-                        touch2.position, 
-                        new Vector2(screenWidth - 150, screenHeight / 2 - 50));
+                        ProcessorTetraSelect(2,
+                        touch1.position,
+                        touch2.position,
+                        tpTetraInClient1);
+                        //new Vector2(screenWidth - 150, screenHeight / 2 - 50));
                     selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
                 }
                 
@@ -234,6 +239,13 @@ public class TouchProcessor : MonoBehaviour
         {
             selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
         }*/
+    }
+
+    public void processClientTetraTouch(int cntClient, Vector2 tp1, Vector2 tp2)
+    {
+        cntTetraSelectingInClient = cntClient;
+        tpTetraInClient1 = tp1;
+        tpTetraInClient2 = tp2;
     }
     #endregion
 
@@ -534,6 +546,7 @@ public class TouchProcessor : MonoBehaviour
         cancelFilterButton.SetActive(true);
         xSlider.SetActive(true);
         ySlider.SetActive(true);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
 
     public void enterFiltering2Mode()
@@ -553,6 +566,7 @@ public class TouchProcessor : MonoBehaviour
         cancelFilterButton.SetActive(true);
         xSlider.SetActive(true);
         ySlider.SetActive(true);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
 
     public void enterSelectionPMode()
@@ -574,6 +588,7 @@ public class TouchProcessor : MonoBehaviour
         cancelSelectButton.SetActive(true);
         xSlider.SetActive(false);
         ySlider.SetActive(false);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
 
     public void enterSelectionTMode()
@@ -612,6 +627,7 @@ public class TouchProcessor : MonoBehaviour
         cancelSelectButton.SetActive(true);
         xSlider.SetActive(false);
         ySlider.SetActive(false);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
 
     public void enterNavigationMode()
@@ -631,6 +647,7 @@ public class TouchProcessor : MonoBehaviour
         cancelSelectButton.SetActive(false);
         xSlider.SetActive(false);
         ySlider.SetActive(false);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
     #endregion
 }

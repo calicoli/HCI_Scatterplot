@@ -43,7 +43,7 @@ public class RenderProcessor : MonoBehaviour
     {
         lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.alignment = LineAlignment.TransformZ;
-        lr.startWidth = lineWidth;
+        lr.startWidth = lr.endWidth = lineWidth;
         lr.startColor = new Color(1, 1, 1, 0.8f);
         lr.endColor = new Color(1, 1, 1, 0.8f);
         lr.enabled = false;

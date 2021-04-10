@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TetraTrigger : MonoBehaviour
 {
+    public GameObject selectProcessor;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,29 +17,32 @@ public class TetraTrigger : MonoBehaviour
     {
         
     }
-
-    void OnTriggerEnter(Collider other)
+    /*
+    private void OnTriggerEnter(Collider other)
     {
-        /*
+        
         if(other.gameObject.transform.parent.name == "PointContainer")
         {
-            Debug.Log("dy5- TEnter//collider name: " + other.gameObject.name);
+            
+            //Debug.Log("dy5- TEnter//collider name: " + other.gameObject.name);
             int idx = System.Convert.ToInt32(other.gameObject.name);
-        }*/
-        ReliableOnTriggerExit.NotifyTriggerEnter(other, gameObject, OnTriggerExit);
-        Debug.Log("dy5- TEnter//collider name: " + other.gameObject.name);
+            selectProcessor.GetComponent<SelectProcessor>().DetectTetraTrigger(true, idx);
+            ReliableOnTriggerExit.NotifyTriggerEnter(other, gameObject, OnTriggerExit);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        /*if (other.gameObject.transform.parent.name == "PointContainer")
+        if (other.gameObject.transform.parent.name == "PointContainer")
         {
-            Debug.Log("dy5- TExit//collider name: " + other.gameObject.name);
+            
+            //Debug.Log("dy5- TExit//collider name: " + other.gameObject.name);
             int idx = System.Convert.ToInt32(other.gameObject.name);
-        }*/
-        ReliableOnTriggerExit.NotifyTriggerExit(other, gameObject);
-        Debug.Log("dy5- TExit//collider name: " + other.gameObject.name);
+            selectProcessor.GetComponent<SelectProcessor>().DetectTetraTrigger(false, idx);
+            ReliableOnTriggerExit.NotifyTriggerExit(other, gameObject);
+        }
     }
+    */
 }
 
 // RealiableTriggerExit：

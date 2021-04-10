@@ -37,12 +37,12 @@ public class BallController : MonoBehaviour
     private float rtxlb, rtylb, rtzlb,
                   rtxub, rtyub, rtzub;
 
-    
+    private bool ballInteractScript;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        ballInteractScript = false;
     }
 
     // Update is called once per frame
@@ -68,6 +68,19 @@ public class BallController : MonoBehaviour
                 pointContainer.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = balls[i].defaultColor;
             }
         }
+    }
+
+    public void UpdateInteractBallScript(bool flag)
+    {
+        if (flag != ballInteractScript)
+        {
+            for (int idx = 0; idx < ballCount; idx++)
+            {
+                pointContainer.transform.GetChild(idx).GetComponent<BoundsIntersectExample>().enabled = flag;
+            }
+            ballInteractScript = flag;
+        }
+        
     }
 
     public void UpdateTetraBallWithID(int idx, bool inRange, out bool flag)
@@ -283,6 +296,7 @@ public class BallController : MonoBehaviour
                 balls[i].oriPosition.x);
             //balls[i].bound = pointContainer.transform.GetChild(i).GetComponent<MeshFilter>().mesh.bounds;
             balls[i].bound = pointContainer.transform.GetChild(i).GetComponent<MeshRenderer>().bounds;
+            
         }
     }
 
