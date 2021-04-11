@@ -67,6 +67,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 65
       Script: {instanceID: 0}
+    - Class: 81
+      Script: {instanceID: 0}
     - Class: 84
       Script: {instanceID: 0}
     - Class: 102
@@ -736,7 +738,7 @@ ScriptsOnlyBuild:
     className: WindowDragger
   - hash:
       serializedVersion: 2
-      Hash: d440fc81194bfbff30f3d9559cb56876
+      Hash: 3206598a306d55c731ae92e7a6ef69cd
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: TouchProcessor

@@ -42,7 +42,9 @@ public class TouchProcessor : MonoBehaviour
     public Vector3 vertex1, vertex2;
     [HideInInspector]
     //public bool isTetraSelectingInServer, isTetraSelectingInClient;
-    public int cntTetraSelectingInServer, cntTetraSelectingInClient;
+    public int cntSelectingInServer, cntSelectingInClient;
+    [HideInInspector]
+    public Vector2 tpSelectInClient1, tpSelectInClient2;
 
     [HideInInspector]
 	public bool isPanning, isRotating, isLocked;
@@ -120,7 +122,7 @@ public class TouchProcessor : MonoBehaviour
         existSelection = false;
         //modeFilter1 = modeFilter2 = false;
         isFilteringInServer = isFilteringInClient = false;
-        
+        cntSelectingInServer = cntSelectingInClient = 0;
     }
 
 	// Update is called once per frame
@@ -172,50 +174,109 @@ public class TouchProcessor : MonoBehaviour
         }
         else if (charMode == 'd' && currentMode == Mode.selectD)
         {
-            //detectSelectDiamond()
+            detectDiamondSelect();
 
         }
     }
 
-    #region TetraSelection
-    public void detectTetraSelect()
+    #region DiamondSelection
+    void detectDiamondSelect()
     {
-        cntTetraSelectingInServer = Input.touchCount;
-        cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
-        if(cntTetraSelectingInServer > 0
-            && cntTetraSelectingInServer + cntTetraSelectingInClient == 3)
+        cntSelectingInServer = Input.touchCount;
+        //cntSelectingInClient = 3 - cntSelectingInServer;
+        if (cntSelectingInServer > 0
+            && cntSelectingInServer + cntSelectingInClient == 3)
         {
-            if(cntTetraSelectingInServer == 1)
+            if (cntSelectingInServer == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 600)
+                if (touch.position.y > 500 && touch.position.y < screenHeight - 500)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
-                        ProcessorTetraSelect(1, 
-                        touch.position, 
-                        new Vector2(screenWidth / 3, 2 * screenHeight / 3), 
-                        new Vector2(3 * screenWidth / 4, screenHeight / 2));
-                    
-                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                        ProcessDiamondSelect(1,
+                        touch.position,
+                        tpSelectInClient1,
+                        tpSelectInClient2);
+                    selectProcessor.GetComponent<SelectProcessor>().showDiamond(true);
                 }
-                Debug.Log("dy6- tp: " + touch.position);
             }
-            else if(cntTetraSelectingInServer == 2)
+            else if (cntSelectingInServer == 2)
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if(touch1.position.y > 600 && touch2.position.y > 600)
+                if (touch1.position.y > 500 && touch1.position.y < screenHeight - 500 &&
+                   touch2.position.y > 500 && touch2.position.y < screenHeight - 500)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
-                        ProcessorTetraSelect(2, 
-                        touch1.position, 
-                        touch2.position, 
-                        new Vector2(screenWidth - 150, screenHeight / 2 - 50));
+                        ProcessDiamondSelect(2,
+                        touch1.position,
+                        touch2.position,
+                        tpSelectInClient1);
+                    selectProcessor.GetComponent<SelectProcessor>().showDiamond(true);
+                }
+
+            }
+            else if (cntSelectingInServer == 3)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                Touch touch3 = Input.touches[2];
+                if (touch1.position.y > 500 && touch2.position.y > 500 && touch3.position.y > 500)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessDiamondSelect(3, touch1.position, touch2.position, touch3.position);
+                    selectProcessor.GetComponent<SelectProcessor>().showDiamond(true);
+                }
+
+            }
+
+        }
+    }
+    #endregion
+
+    #region TetraSelection
+    void detectTetraSelect()
+    {
+        cntSelectingInServer = Input.touchCount;
+        //cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
+        if(cntSelectingInServer > 0
+            && cntSelectingInServer + cntSelectingInClient == 3)
+        {
+            if(cntSelectingInServer == 1)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.position.y > 600 && touch.position.y < screenHeight - 500)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessTetraSelect(1,
+                        touch.position,
+                        tpSelectInClient1,
+                        tpSelectInClient2);
+                        //new Vector2(screenWidth / 3, 2 * screenHeight / 3), 
+                        //new Vector2(3 * screenWidth / 4, screenHeight / 2));
+
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+            }
+            else if(cntSelectingInServer == 2)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                if(touch1.position.y > 600 && touch1.position.y < screenHeight - 500 &&
+                   touch2.position.y > 600 && touch2.position.y < screenHeight - 500)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessTetraSelect(2,
+                        touch1.position,
+                        touch2.position,
+                        tpSelectInClient1);
+                        //new Vector2(screenWidth - 150, screenHeight / 2 - 50));
                     selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
                 }
                 
             }
-            else if(cntTetraSelectingInServer == 3)
+            // only test
+            else if(cntSelectingInServer == 3)
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
@@ -223,7 +284,7 @@ public class TouchProcessor : MonoBehaviour
                 if (touch1.position.y > 600 && touch2.position.y > 600 && touch3.position.y > 600)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
-                        ProcessorTetraSelect(3, touch1.position, touch2.position, touch3.position);
+                        ProcessTetraSelect(3, touch1.position, touch2.position, touch3.position);
                     selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
                 }
                 
@@ -234,6 +295,13 @@ public class TouchProcessor : MonoBehaviour
         {
             selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
         }*/
+    }
+
+    public void processClientTetraTouch(int cntClient, Vector2 tp1, Vector2 tp2)
+    {
+        cntSelectingInClient = cntClient;
+        tpSelectInClient1 = tp1;
+        tpSelectInClient2 = tp2;
     }
     #endregion
 
@@ -526,11 +594,8 @@ public class TouchProcessor : MonoBehaviour
         //modeNavigate = modeSelect = modeFilter2 = false;
         sender.GetComponent<ServerController>().sendMessage();
 
-        GameObject pa = this.transform.parent.gameObject;
-        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
-        lt.SetActive(false);
 
-        cancelSelectButton.SetActive(false);
+        setIrrelevantOptionInactive();
         cancelFilterButton.SetActive(true);
         xSlider.SetActive(true);
         ySlider.SetActive(true);
@@ -545,11 +610,7 @@ public class TouchProcessor : MonoBehaviour
         //modeNavigate = modeSelect = modeFilter1 = false;
         sender.GetComponent<ServerController>().sendMessage();
 
-        GameObject pa = this.transform.parent.gameObject;
-        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
-        lt.SetActive(false);
-
-        cancelSelectButton.SetActive(false);
+        setIrrelevantOptionInactive();
         cancelFilterButton.SetActive(true);
         xSlider.SetActive(true);
         ySlider.SetActive(true);
@@ -565,15 +626,8 @@ public class TouchProcessor : MonoBehaviour
         //modeNavigate = modeFilter1 = modeFilter2 = false;
         sender.GetComponent<ServerController>().sendMessage();
 
-        GameObject pa = this.transform.parent.gameObject;
-        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
-        lt.SetActive(false);
-
-        //pointText.text = null;
-        cancelFilterButton.SetActive(false);
+        setIrrelevantOptionInactive();
         cancelSelectButton.SetActive(true);
-        xSlider.SetActive(false);
-        ySlider.SetActive(false);
     }
 
     public void enterSelectionTMode()
@@ -584,15 +638,9 @@ public class TouchProcessor : MonoBehaviour
         currentMode = Mode.selectT;
         sender.GetComponent<ServerController>().sendMessage();
 
-        GameObject pa = this.transform.parent.gameObject;
-        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
-        lt.SetActive(false);
-
-        //pointText.text = null;
-        cancelFilterButton.SetActive(false);
+        setIrrelevantOptionInactive();
         cancelSelectButton.SetActive(true);
-        xSlider.SetActive(false);
-        ySlider.SetActive(false);
+        selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
     }
 
     public void enterSelectionDMode()
@@ -600,18 +648,12 @@ public class TouchProcessor : MonoBehaviour
         charMode = 'd';
         modeText.text = "Mode: Selection D";
         //!!!
-        currentMode = Mode.selectT;
+        currentMode = Mode.selectD;
         sender.GetComponent<ServerController>().sendMessage();
 
-        GameObject pa = this.transform.parent.gameObject;
-        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
-        lt.SetActive(false);
-
-        //pointText.text = null;
-        cancelFilterButton.SetActive(false);
+        setIrrelevantOptionInactive();
         cancelSelectButton.SetActive(true);
-        xSlider.SetActive(false);
-        ySlider.SetActive(false);
+        selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
     }
 
     public void enterNavigationMode()
@@ -623,14 +665,22 @@ public class TouchProcessor : MonoBehaviour
         //modeFilter1 = modeFilter2 = modeSelect = false;
         sender.GetComponent<ServerController>().sendMessage();
 
+        setIrrelevantOptionInactive();
         GameObject pa = this.transform.parent.gameObject;
         GameObject lt = pa.transform.Find("LeanTouch").gameObject;
         lt.SetActive(true);
+    }
 
+    void setIrrelevantOptionInactive()
+    {
+        GameObject pa = this.transform.parent.gameObject;
+        GameObject lt = pa.transform.Find("LeanTouch").gameObject;
+        lt.SetActive(false);
         cancelFilterButton.SetActive(false);
         cancelSelectButton.SetActive(false);
         xSlider.SetActive(false);
         ySlider.SetActive(false);
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
     }
     #endregion
 }

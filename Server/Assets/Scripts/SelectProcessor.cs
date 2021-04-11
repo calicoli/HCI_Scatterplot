@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SelectProcessor : MonoBehaviour
 {
     public GameObject ballController;
+    public GameObject pointContainer;
     public GameObject renderProcessor;
     public Text pointText;
     public GameObject orthCamera;
@@ -25,6 +26,13 @@ public class SelectProcessor : MonoBehaviour
     private GameObject edgeTetra;
     private LineRenderer lrEdgeTetra;
     private Bounds boundTetra;
+    private int cntBallTetraSelect;
+    private bool ballEnableInteractScript;
+
+    public GameObject diamondContainer;
+    private GameObject quadDiamond;
+    private MeshRenderer mrDiamond;
+    private MeshFilter mfDiamond;
 
     public GameObject objOrigin, objXEnd, objYEnd, objZEnd;
     private Vector3 posOrigin, posXEnd, posYEnd, posZEnd;
@@ -37,10 +45,17 @@ public class SelectProcessor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        tpPrevTs1 = tpPrevTs2 = tpPrevTs3 = Vector2.zero;
-        posOrigin = objOrigin.transform.position;
+        resetPublicParams();
+        updateAnchorPosition();
+        // pointSelect
         initConnectingLine();
+        // tetraSelect
         initTetra();
+        cntBallTetraSelect = 0;
+        ballEnableInteractScript = false;
+        // diamSelect
+        initDiamond();
+        
     }
 
     // Update is called once per frame
@@ -61,6 +76,12 @@ public class SelectProcessor : MonoBehaviour
         dnposOtherFrameEdge = frameOtherDevice.GetComponent<FrameController>().lineRenderer.GetPosition(1);
         upposThisFrameEdge = frameThisDevice.GetComponent<FrameController>().lineRenderer.GetPosition(1);
         dnposThisFrameEdge = frameThisDevice.GetComponent<FrameController>().lineRenderer.GetPosition(0);
+    }
+
+    public void resetPublicParams()
+    {
+        tpPrevTs1 = tpPrevTs2 = tpPrevTs3 = Vector2.zero;
+        pointText.text = null;
     }
 
     void initConnectingLine()
@@ -92,14 +113,69 @@ public class SelectProcessor : MonoBehaviour
         lrEdgeTetra = edgeTetra.GetComponent<LineRenderer>();
         renderProcessor.GetComponent<RenderProcessor>().initLineRenderer(lrEdgeTetra);
         lrEdgeTetra.material.color = new Color32(0, 0, 255, 100);
+        lrEdgeTetra.startWidth = lrEdgeTetra.endWidth = 0.05f;
 
         // tetra
         tetraContainer.GetComponent<MeshRenderer>().enabled = false;
         tetraContainer.GetComponent<MeshRenderer>().material.color = new Color32(0, 0, 255, 100);
-        RedrawTetra(posOrigin, posOrigin, posOrigin);
+        RedrawTetra(posOrigin, posOrigin+Vector3.left, posOrigin + Vector3.back);
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        for(int i=0; i< cntBall; i++)
+        {
+            pointContainer.transform.GetChild(i).GetComponent<BoundsIntersectExample>().
+                meshCollider = tetraContainer.GetComponent<MeshCollider>();
+        }
     }
 
-    public void ProcessorTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
+    void initDiamond()
+    {
+        quadDiamond = diamondContainer.transform.GetChild(0).gameObject;
+        mrDiamond = quadDiamond.GetComponent<MeshRenderer>();
+        mfDiamond = quadDiamond.GetComponent<MeshFilter>();
+
+        renderProcessor.GetComponent<RenderProcessor>().initMeshRenderer(mrDiamond);
+        mrDiamond.material.color = new Color32(0, 0, 255, 100);
+    }
+
+    public void ProcessDiamondSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
+    {
+        if (tp1 == tpPrevTs1 && tp2 == tpPrevTs2 && tp3 == tpPrevTs3)
+        {
+            return;
+        }
+        else
+        {
+            tpPrevTs1 = tp1;
+            tpPrevTs2 = tp2;
+            tpPrevTs3 = tp3;
+        }
+        Vector3 p1, p2, p3;
+        if (cntServer == 1)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processClientTouchPoint(tp2);
+            p3 = processClientTouchPoint(tp3);
+        }
+        else if (cntServer == 2)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            p3 = processClientTouchPoint(tp3);
+        }
+        else if (cntServer == 3)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            p3 = processServerTouchPoint(tp3);
+        }
+        else
+        {
+            p1 = p2 = p3 = Vector3.zero;
+        }
+        RedrawDiamond(cntServer, p1, p2, p3);
+    }
+
+    public void ProcessTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
     {
         if(tp1 == tpPrevTs1 && tp2 == tpPrevTs2 && tp3 == tpPrevTs3)
         {
@@ -136,9 +212,62 @@ public class SelectProcessor : MonoBehaviour
         RedrawTetra(p1, p2, p3);
         RedrawTetraEdge(p1, p2, p3);
         //DetectTetraIntersecting();
+        if(!ballEnableInteractScript)
+        {
+            AddBoundsIntersectScriptonBall();
+        }
+        DetectTetraRayIntersecting();
 
     }
 
+    void AddBoundsIntersectScriptonBall()
+    {
+        ballController.GetComponent<BallController>().UpdateInteractBallScript(true);
+    }
+
+    void DetectTetraRayIntersecting()
+    {
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        int cntInTetra = 0;
+        for(int i = 0; i< cntBall; i++)
+        {
+            bool inTetra = pointContainer.transform.GetChild(i).GetComponent<BoundsIntersectExample>().In;
+            bool valid;
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(i, inTetra, out valid);
+            if (valid)
+            {
+                cntInTetra++;
+            } else
+            {
+                cntInTetra--;
+            }
+        }
+        ballController.GetComponent<BallController>().UpdateBallVisulization();
+        pointText.text = "Tetra select point number: " + cntBallTetraSelect;          
+    }
+
+    // abondon
+    public void DetectTetraTrigger(bool enterTrigger, int idx) 
+    {
+        bool valid;
+        if (enterTrigger)
+        {
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, true, out valid);
+            if(valid)
+            {
+                cntBallTetraSelect++;
+            }
+        } else
+        {
+            Debug.Log("exit following1 function");
+            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, false, out valid);
+            cntBallTetraSelect--;
+        }
+        //ballController.GetComponent<BallController>().UpdateBallVisulization();
+        pointText.text = "Tetra select point number: " + cntBallTetraSelect;
+    }
+
+    // abondon
     void DetectTetraIntersecting()
     {
         //boundTetra = tetraContainer.GetComponent<MeshFilter>().mesh.bounds;
@@ -175,6 +304,45 @@ public class SelectProcessor : MonoBehaviour
         }
     }
 
+
+    void RedrawDiamond(int cntServer, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3 p4 = Vector3.zero;
+        Vector3[] varr = new Vector3[4];
+        // calculate the P4 position 
+        if (cntServer == 1)
+        {
+            if(Mathf.Abs(p2.y - p1.y) < Mathf.Abs(p3.y - p1.y))
+            {
+                p4 = p3 + p1 - p2;
+                Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+            } else
+            {
+                p4 = p2 + p1 - p3;
+                Vector3[] temp = { p3, p2, p1, p4 }; varr = temp;
+            }
+        } else if(cntServer == 2)
+        {
+            if(Mathf.Abs(p1.y - p3.y) < Mathf.Abs(p2.y - p3.y))
+            {
+                p4 = p2 + p3 - p1;
+                Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+            } else
+            {
+                p4 = p1 + p3 - p2;
+                Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+            }
+        } else if(cntServer == 3)
+        {
+            p4 = p2 + p3 - p1;
+            Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+        }
+        
+        Mesh mesh = new Mesh();
+        renderProcessor.GetComponent<RenderProcessor>().updateQuad(true, varr, out mesh);
+        mesh.name = "diamond-quad";
+        mfDiamond.mesh = mesh;
+    }
     void RedrawTetraEdge(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         Vector3[] vars = {
@@ -219,8 +387,20 @@ public class SelectProcessor : MonoBehaviour
         Mesh tetraMesh = new Mesh();
         tetraMesh.CombineMeshes(combineInstances);
         tetraMesh.name = "tetra";
-        tetraContainer.GetComponent<MeshFilter>().mesh = tetraMesh;
-        tetraContainer.GetComponent<MeshCollider>().sharedMesh = tetraContainer.GetComponent<MeshFilter>().mesh;
+        if(tetraMesh)
+        {
+            tetraContainer.GetComponent<MeshFilter>().mesh = tetraMesh;
+            tetraContainer.GetComponent<MeshCollider>().sharedMesh = tetraMesh;
+        }
+    }
+
+    public void showDiamond(bool flag)
+    {
+        diamondContainer.transform.GetChild(0).GetComponent<MeshRenderer>().enabled = flag;
+        if (!flag)
+        {
+            pointText.text = null;
+        }
     }
 
     public void showTetra(bool flag)
@@ -233,6 +413,10 @@ public class SelectProcessor : MonoBehaviour
         */
         lrEdgeTetra.enabled = flag;
         tetraContainer.GetComponent<MeshRenderer>().enabled = flag;
+        if(!flag)
+        {
+            pointText.text = null;
+        }
     }
 
     public void DetectRaycastOnBallwithNewRaycast(int num, Vector2 v1, Vector2 v2)
@@ -347,6 +531,7 @@ public class SelectProcessor : MonoBehaviour
         Vector3 rv = Vector3.zero;
         rv.x = v.x - Screen.width / 2;
         rv.y = v.y - Screen.height / 2;
+        rv.z = posOrigin.z;
         //Debug.Log("dy4 - v: " + v);
         //Debug.Log("dy4 - rv0: " + rv);
         //rv = rv * (cameraOrthSize / (Screen.height / 2));

@@ -23,7 +23,7 @@ public class FrameController : MonoBehaviour
 	{
 		lineRenderer = this.gameObject.AddComponent<LineRenderer>();
 		lineRenderer.alignment = LineAlignment.TransformZ;
-		lineRenderer.startWidth = lineWidth;
+		lineRenderer.startWidth = lineRenderer.endWidth = lineWidth;
 		lineRenderer.useWorldSpace = false;
 		lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
 		

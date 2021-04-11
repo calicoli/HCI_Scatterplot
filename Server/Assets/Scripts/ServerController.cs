@@ -41,6 +41,7 @@ public class ServerController : MonoBehaviour {
 	
 	void Update () {
 		ipText.text = getIPAddress();
+        
 		renderCamera.backgroundColor = (connectedTcpClient == null ? disconnectColor : connectColor);
 		if (connectedTcpClient != null && noConnection) {
 			sendMessage();
@@ -161,7 +162,15 @@ public class ServerController : MonoBehaviour {
             filterProcessor.GetComponent<FilterProcessor>().ProcessorClientRange(
                 clientFiltering, minn, maxx);
         }
-
+        if (touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectT ||
+            touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectD)
+        {
+            int cntClientTetra = System.Convert.ToInt32(temp[16]);
+            Vector2 tp1 = new Vector2(System.Convert.ToSingle(temp[17]), System.Convert.ToSingle(temp[18]));
+            Vector2 tp2 = new Vector2(System.Convert.ToSingle(temp[19]), System.Convert.ToSingle(temp[20]));
+            touchProcessor.GetComponent<TouchProcessor>().
+                processClientTetraTouch(cntClientTetra, tp1, tp2);
+        }
 
         //touchProcessor.GetComponent<TouchProcessor>().angle = System.Convert.ToSingle(temp[3]);
 

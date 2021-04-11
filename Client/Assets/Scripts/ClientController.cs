@@ -92,6 +92,8 @@ public class ClientController : MonoBehaviour {
         Vector3 ts = touchProcessor.GetComponent<TouchProcessor>().sca;
         bool tisClientSelecting = touchProcessor.GetComponent<TouchProcessor>().isClientSelecting;
         bool tisClientFiltering = touchProcessor.GetComponent<TouchProcessor>().isClientFiltering;
+        Vector2 tpTDselect1 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect1;
+        Vector2 tpTDselect2 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect2;
         string clientMessage =
             //(touchProcessor.GetComponent<TouchProcessor>().isPanning ? "T" : "F") +
             //(touchProcessor.GetComponent<TouchProcessor>().isRotating ? "T" : "F") +
@@ -103,7 +105,9 @@ public class ClientController : MonoBehaviour {
             touchProcessor.GetComponent<TouchProcessor>().selectDepth + "," +
             (tisClientFiltering ? "T" : "F") + "," +
             touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "," +
-            touchProcessor.GetComponent<TouchProcessor>().upperFilterDelta + ","
+            touchProcessor.GetComponent<TouchProcessor>().upperFilterDelta + "," +
+            touchProcessor.GetComponent<TouchProcessor>().cntTetraOrDiamSelectingInClient + "," +
+            tpTDselect1.x + "," + tpTDselect1.y + "," + tpTDselect2.x + "," + tpTDselect2.y + ","
             ;
         Debug.Log("dy3-2 lowerFilterDelta: " +
             touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "upper: " +
@@ -185,7 +189,7 @@ public class ClientController : MonoBehaviour {
 
 	public void connect() {
         //string address = "192.168.236.1";
-        string address = "192.168.0.103";
+        string address = "192.168.0.104";
         //Macbook local connecting to iPhone hotspot: 172.20.10.2
         //Samsung connecting to iPhone hotspot: 172.20.10.6
         //Samsung connecting to xdd44's wifi: 192.168.0.106
