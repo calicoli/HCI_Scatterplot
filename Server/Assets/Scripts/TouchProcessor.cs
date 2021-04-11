@@ -190,7 +190,7 @@ public class TouchProcessor : MonoBehaviour
             if (cntSelectingInServer == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 500 && touch.position.y < screenHeight - 500)
+                if (touch.position.y > 400 && touch.position.y < screenHeight - 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessDiamondSelect(1,
@@ -204,8 +204,8 @@ public class TouchProcessor : MonoBehaviour
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if (touch1.position.y > 500 && touch1.position.y < screenHeight - 500 &&
-                   touch2.position.y > 500 && touch2.position.y < screenHeight - 500)
+                if (touch1.position.y > 400 && touch1.position.y < screenHeight - 400 &&
+                   touch2.position.y > 400 && touch2.position.y < screenHeight - 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessDiamondSelect(2,
@@ -221,7 +221,7 @@ public class TouchProcessor : MonoBehaviour
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
                 Touch touch3 = Input.touches[2];
-                if (touch1.position.y > 500 && touch2.position.y > 500 && touch3.position.y > 500)
+                if (touch1.position.y > 400 && touch2.position.y > 400 && touch3.position.y > 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessDiamondSelect(3, touch1.position, touch2.position, touch3.position);
@@ -245,7 +245,7 @@ public class TouchProcessor : MonoBehaviour
             if(cntSelectingInServer == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 600 && touch.position.y < screenHeight - 500)
+                if (touch.position.y > 400 && touch.position.y < screenHeight - 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessTetraSelect(1,
@@ -262,8 +262,8 @@ public class TouchProcessor : MonoBehaviour
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if(touch1.position.y > 600 && touch1.position.y < screenHeight - 500 &&
-                   touch2.position.y > 600 && touch2.position.y < screenHeight - 500)
+                if(touch1.position.y > 400 && touch1.position.y < screenHeight - 400 &&
+                   touch2.position.y > 400 && touch2.position.y < screenHeight - 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessTetraSelect(2,
@@ -281,7 +281,7 @@ public class TouchProcessor : MonoBehaviour
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
                 Touch touch3 = Input.touches[2];
-                if (touch1.position.y > 600 && touch2.position.y > 600 && touch3.position.y > 600)
+                if (touch1.position.y > 400 && touch2.position.y > 400 && touch3.position.y > 400)
                 {
                     selectProcessor.GetComponent<SelectProcessor>().
                         ProcessTetraSelect(3, touch1.position, touch2.position, touch3.position);
@@ -291,10 +291,6 @@ public class TouchProcessor : MonoBehaviour
             }
             
         }
-        /*else
-        {
-            selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
-        }*/
     }
 
     public void processClientTetraTouch(int cntClient, Vector2 tp1, Vector2 tp2)
@@ -669,6 +665,8 @@ public class TouchProcessor : MonoBehaviour
         GameObject pa = this.transform.parent.gameObject;
         GameObject lt = pa.transform.Find("LeanTouch").gameObject;
         lt.SetActive(true);
+        selectProcessor.GetComponent<SelectProcessor>().showDiamond(true);
+        selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
     }
 
     void setIrrelevantOptionInactive()
@@ -681,6 +679,8 @@ public class TouchProcessor : MonoBehaviour
         xSlider.SetActive(false);
         ySlider.SetActive(false);
         ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
+        selectProcessor.GetComponent<SelectProcessor>().showDiamond(false);
+        selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
     }
     #endregion
 }

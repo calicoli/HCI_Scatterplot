@@ -83,7 +83,7 @@ public class BallController : MonoBehaviour
         
     }
 
-    public void UpdateTetraBallWithID(int idx, bool inRange, out bool flag)
+    public void UpdateSelectedBallWithID(int idx, bool inRange, out bool flag)
     {
         if (!balls[idx].isFiltered && inRange)
         {
