@@ -13,7 +13,7 @@ public class RenderProcessor : MonoBehaviour
                 new Vector2(0, 0), -new Vector2(1, 0),
                 new Vector2(1, 1), new Vector2(0, 1)
             };
-    private int[] indicesQuad = new int[6] { 0, 1, 2, 0, 2, 3 };
+    private int[] indicesQuad = new int[6] { 0, 1, 2, 1, 2, 3 };
 
     // triangle vars
     private Vector3[] normalsTri = {
@@ -71,7 +71,6 @@ public class RenderProcessor : MonoBehaviour
     }
 
     public void updateQuad(bool flag, Vector3[] vertices, 
-        //out bool enable, 
         out Mesh outMesh)
     {
         Mesh mesh = new Mesh();
@@ -81,19 +80,15 @@ public class RenderProcessor : MonoBehaviour
             mesh.normals = normalsQuad;
             mesh.uv = uvsQuad;
             mesh.triangles = indicesQuad;
-            //enable = true;
             outMesh = mesh;
-            // important! enable mr
         }
         else
         {
-            //enable = false;
             outMesh = mesh;
         }
     }
 
     public void updateTri(bool flag, Vector3[] vertices,
-        //out bool enable, 
         out Mesh outMesh)
     {
         Mesh mesh = new Mesh();
@@ -103,13 +98,10 @@ public class RenderProcessor : MonoBehaviour
             mesh.normals = normalsTri;
             mesh.uv = uvsTri;
             mesh.triangles = indicesTri;
-            //enable = true;
             outMesh = mesh;
-            // important! enable mr
         }
         else
         {
-            //enable = false;
             outMesh = mesh;
         }
     }

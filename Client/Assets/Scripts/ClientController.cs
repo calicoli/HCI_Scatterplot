@@ -92,8 +92,8 @@ public class ClientController : MonoBehaviour {
         Vector3 ts = touchProcessor.GetComponent<TouchProcessor>().sca;
         bool tisClientSelecting = touchProcessor.GetComponent<TouchProcessor>().isClientSelecting;
         bool tisClientFiltering = touchProcessor.GetComponent<TouchProcessor>().isClientFiltering;
-        Vector2 tpTetra1 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect1;
-        Vector2 tpTetra2 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect2;
+        Vector2 tpTDselect1 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect1;
+        Vector2 tpTDselect2 = touchProcessor.GetComponent<TouchProcessor>().tpTetraOrDiamSelect2;
         string clientMessage =
             //(touchProcessor.GetComponent<TouchProcessor>().isPanning ? "T" : "F") +
             //(touchProcessor.GetComponent<TouchProcessor>().isRotating ? "T" : "F") +
@@ -107,7 +107,7 @@ public class ClientController : MonoBehaviour {
             touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "," +
             touchProcessor.GetComponent<TouchProcessor>().upperFilterDelta + "," +
             touchProcessor.GetComponent<TouchProcessor>().cntTetraOrDiamSelectingInClient + "," +
-            tpTetra1.x + "," + tpTetra1.y + "," + tpTetra2.x + "," + tpTetra2.y + ","
+            tpTDselect1.x + "," + tpTDselect1.y + "," + tpTDselect2.x + "," + tpTDselect2.y + ","
             ;
         Debug.Log("dy3-2 lowerFilterDelta: " +
             touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "upper: " +
