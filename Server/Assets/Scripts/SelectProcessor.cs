@@ -26,13 +26,13 @@ public class SelectProcessor : MonoBehaviour
     private GameObject edgeTetra;
     private LineRenderer lrEdgeTetra;
     private Bounds boundTetra;
-    private int cntBallTetraSelect;
     private bool ballEnableInteractScript;
 
     public GameObject diamondContainer;
     private GameObject quadDiamond;
     private MeshRenderer mrDiamond;
     private MeshFilter mfDiamond;
+    private Vector3 normalDiamond;
 
     public GameObject objOrigin, objXEnd, objYEnd, objZEnd;
     private Vector3 posOrigin, posXEnd, posYEnd, posZEnd;
@@ -51,7 +51,6 @@ public class SelectProcessor : MonoBehaviour
         initConnectingLine();
         // tetraSelect
         initTetra();
-        cntBallTetraSelect = 0;
         ballEnableInteractScript = false;
         // diamSelect
         initDiamond();
@@ -173,6 +172,7 @@ public class SelectProcessor : MonoBehaviour
             p1 = p2 = p3 = Vector3.zero;
         }
         RedrawDiamond(cntServer, p1, p2, p3);
+        DetectDiamondRelativePosition(p1);
     }
 
     public void ProcessTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
@@ -220,6 +220,29 @@ public class SelectProcessor : MonoBehaviour
 
     }
 
+    #region detect diamond select
+    void DetectDiamondRelativePosition(Vector3 pointOnDiamond)
+    {
+        int cntBall = ballController.GetComponent<BallController>().ballCount;
+        int cntBeforeDiamond = 0;
+        for(int idx = 0; idx < cntBall; idx++)
+        {
+            Vector3 posBall = pointContainer.transform.GetChild(idx).transform.position;
+            Vector3 vecBall = posBall - pointOnDiamond;
+            bool beforeDiamond = Vector3.Dot(vecBall, normalDiamond) > 0;
+            bool valid;
+            ballController.GetComponent<BallController>().UpdateSelectedBallWithID(idx, beforeDiamond, out valid);
+            if(valid)
+            {
+                cntBeforeDiamond++;
+            }
+        }
+        ballController.GetComponent<BallController>().UpdateBallVisulization();
+        pointText.text = "Diamond select point number: " + cntBeforeDiamond;
+    }
+    #endregion
+
+    #region detect tetra select
     void AddBoundsIntersectScriptonBall()
     {
         ballController.GetComponent<BallController>().UpdateInteractBallScript(true);
@@ -233,26 +256,24 @@ public class SelectProcessor : MonoBehaviour
         {
             bool inTetra = pointContainer.transform.GetChild(i).GetComponent<BoundsIntersectExample>().In;
             bool valid;
-            ballController.GetComponent<BallController>().UpdateTetraBallWithID(i, inTetra, out valid);
+            ballController.GetComponent<BallController>().UpdateSelectedBallWithID(i, inTetra, out valid);
             if (valid)
             {
                 cntInTetra++;
-            } else
-            {
-                cntInTetra--;
             }
         }
         ballController.GetComponent<BallController>().UpdateBallVisulization();
-        pointText.text = "Tetra select point number: " + cntBallTetraSelect;          
+        pointText.text = "Tetra select point number: " + cntInTetra;          
     }
 
     // abondon
     public void DetectTetraTrigger(bool enterTrigger, int idx) 
     {
+        int cntBallTetraSelect = 0;
         bool valid;
         if (enterTrigger)
         {
-            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, true, out valid);
+            ballController.GetComponent<BallController>().UpdateSelectedBallWithID(idx, true, out valid);
             if(valid)
             {
                 cntBallTetraSelect++;
@@ -260,7 +281,7 @@ public class SelectProcessor : MonoBehaviour
         } else
         {
             Debug.Log("exit following1 function");
-            ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, false, out valid);
+            ballController.GetComponent<BallController>().UpdateSelectedBallWithID(idx, false, out valid);
             cntBallTetraSelect--;
         }
         //ballController.GetComponent<BallController>().UpdateBallVisulization();
@@ -284,11 +305,11 @@ public class SelectProcessor : MonoBehaviour
             isIntersecting = boundTetra.Intersects(boundBall);
             if(isIntersecting)
             {
-                ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, true, out cntValid);
+                ballController.GetComponent<BallController>().UpdateSelectedBallWithID(idx, true, out cntValid);
                 cntTetraSelect = cntValid ? cntTetraSelect + 1 : cntTetraSelect;
             } else
             {
-                ballController.GetComponent<BallController>().UpdateTetraBallWithID(idx, false, out cntValid);
+                ballController.GetComponent<BallController>().UpdateSelectedBallWithID(idx, false, out cntValid);
             }
         }
         Debug.Log("dy4- ball number in tetraRange: " + cntTetraSelect);
@@ -303,7 +324,7 @@ public class SelectProcessor : MonoBehaviour
             testCube.GetComponent<MeshRenderer>().material.color = Color.white;
         }
     }
-
+    #endregion
 
     void RedrawDiamond(int cntServer, Vector3 p1, Vector3 p2, Vector3 p3)
     {
@@ -312,6 +333,7 @@ public class SelectProcessor : MonoBehaviour
         // calculate the P4 position 
         if (cntServer == 1)
         {
+            // draw diamond
             if(Mathf.Abs(p2.y - p1.y) < Mathf.Abs(p3.y - p1.y))
             {
                 p4 = p3 + p1 - p2;
@@ -320,6 +342,17 @@ public class SelectProcessor : MonoBehaviour
             {
                 p4 = p2 + p1 - p3;
                 Vector3[] temp = { p3, p2, p1, p4 }; varr = temp;
+            }
+            // calculate normal of diamond
+            if(p2.y > p3.y)
+            {
+                Vector3 vec1 = p3 - p2, vec2 = p3 - p1;
+                normalDiamond = Vector3.Cross(vec1, vec2);
+            }
+            else
+            {
+                Vector3 vec1 = p2 - p3, vec2 = p2 - p1;
+                normalDiamond = Vector3.Cross(vec1, vec2);
             }
         } else if(cntServer == 2)
         {
@@ -332,10 +365,21 @@ public class SelectProcessor : MonoBehaviour
                 p4 = p1 + p3 - p2;
                 Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
             }
+            if(p1.y > p2.y)
+            {
+                Vector3 vec1 = p1 - p2, vec2 = p1 - p3;
+                normalDiamond = Vector3.Cross(vec1, vec2);
+            }
+            else
+            {
+                Vector3 vec1 = p2 - p1, vec2 = p2 - p3;
+                normalDiamond = Vector3.Cross(vec1, vec2);
+            }
         } else if(cntServer == 3)
         {
             p4 = p2 + p3 - p1;
             Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+            normalDiamond = Vector3.Cross(p1 - p2, p1 - p3);
         }
         
         Mesh mesh = new Mesh();
@@ -343,6 +387,7 @@ public class SelectProcessor : MonoBehaviour
         mesh.name = "diamond-quad";
         mfDiamond.mesh = mesh;
     }
+
     void RedrawTetraEdge(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         Vector3[] vars = {
