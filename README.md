@@ -11,3 +11,4 @@ HCI_Scatterplot
     - point select ( cnt = 1, 2
     - tetra select ( 0 <= cnt <= total
     - diamond select ( 0 <= cnt <= total
+    - angle tetra select  ( 0 <= cnt <= total
