@@ -19,6 +19,7 @@ public class SelectProcessor : MonoBehaviour
     private LineRenderer lrLine;
     private const float lineWidth = 0.1f;
 
+    public bool curTetraStatus;
     public GameObject tetraContainer;
     private GameObject[] triTetra = new GameObject[4];
     private MeshRenderer[] mrTetra = new MeshRenderer[4];
@@ -28,6 +29,7 @@ public class SelectProcessor : MonoBehaviour
     private Bounds boundTetra;
     private bool ballEnableInteractScript;
 
+    public bool curDiamondStatus;
     public GameObject diamondContainer;
     private GameObject quadDiamond;
     private MeshRenderer mrDiamond;
@@ -213,6 +215,73 @@ public class SelectProcessor : MonoBehaviour
         RedrawTetraEdge(p1, p2, p3);
         //DetectTetraIntersecting();
         if(!ballEnableInteractScript)
+        {
+            AddBoundsIntersectScriptonBall();
+        }
+        DetectTetraRayIntersecting();
+
+    }
+
+    public void ProcessAngleTetraSelect(int cntServer, Vector2 tp1, Vector2 tp2, Vector2 tp3)
+    {
+        if (tp1 == tpPrevTs1 && tp2 == tpPrevTs2 && tp3 == tpPrevTs3)
+        {
+            return;
+        }
+        else
+        {
+            tpPrevTs1 = tp1;
+            tpPrevTs2 = tp2;
+            tpPrevTs3 = tp3;
+        }
+        Vector3 p1, p2, p3;
+        if (cntServer == 1)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p1.y = posOrigin.y; p1.z = posOrigin.z;
+            p2 = processClientTouchPoint(tp2);
+            p3 = processClientTouchPoint(tp3);
+            if(p2.y > p3.y)
+            {
+                p2.x = posOrigin.x; p2.z = posOrigin.z;
+                p3.x = posOrigin.x; p3.y = posOrigin.y;
+            } else
+            {
+                p3.x = posOrigin.x; p3.z = posOrigin.z;
+                p2.x = posOrigin.x; p2.y = posOrigin.y;
+            }
+        }
+        else if (cntServer == 2)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            if(p1.y > p2.y)
+            {
+                p2.y = posOrigin.y; p2.z = posOrigin.z;
+                p1.x = posOrigin.x; p1.z = posOrigin.z;
+            }
+            else
+            {
+                p1.y = posOrigin.y; p1.z = posOrigin.z;
+                p2.x = posOrigin.x; p2.z = posOrigin.z;
+            }
+            p3 = processClientTouchPoint(tp3);
+            p3.x = posOrigin.x; p3.y = posOrigin.y;
+        }
+        else if (cntServer == 3)
+        {
+            p1 = processServerTouchPoint(tp1);
+            p2 = processServerTouchPoint(tp2);
+            p3 = processServerTouchPoint(tp3);
+        }
+        else
+        {
+            p1 = p2 = p3 = Vector3.zero;
+        }
+        RedrawTetra(p1, p2, p3);
+        RedrawTetraEdge(p1, p2, p3);
+        //DetectTetraIntersecting();
+        if (!ballEnableInteractScript)
         {
             AddBoundsIntersectScriptonBall();
         }
@@ -446,6 +515,7 @@ public class SelectProcessor : MonoBehaviour
         {
             pointText.text = null;
         }
+        curDiamondStatus = flag;
     }
 
     public void showTetra(bool flag)
@@ -462,6 +532,7 @@ public class SelectProcessor : MonoBehaviour
         {
             pointText.text = null;
         }
+        curTetraStatus = flag;
     }
 
     public void DetectRaycastOnBallwithNewRaycast(int num, Vector2 v1, Vector2 v2)

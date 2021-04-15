@@ -131,13 +131,11 @@ public class ServerController : MonoBehaviour {
 			float z = System.Convert.ToSingle(temp[2]);
 			Vector3 v = new Vector3(x, y, z);
 			touchProcessor.GetComponent<TouchProcessor>().pos = v;
-            // rotate 
-            
+            // rotate
             touchProcessor.GetComponent<TouchProcessor>().rot.x = System.Convert.ToSingle(temp[3]);
             touchProcessor.GetComponent<TouchProcessor>().rot.y = System.Convert.ToSingle(temp[4]);
             touchProcessor.GetComponent<TouchProcessor>().rot.z = System.Convert.ToSingle(temp[5]);
             touchProcessor.GetComponent<TouchProcessor>().rot.w = System.Convert.ToSingle(temp[6]);
-            
             // scale
             touchProcessor.GetComponent<TouchProcessor>().sca =
                 new Vector3(System.Convert.ToSingle(temp[7]),
@@ -163,7 +161,8 @@ public class ServerController : MonoBehaviour {
                 clientFiltering, minn, maxx);
         }
         if (touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectT ||
-            touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectD)
+            touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectD ||
+            touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectA )
         {
             int cntClientTetra = System.Convert.ToInt32(temp[16]);
             Vector2 tp1 = new Vector2(System.Convert.ToSingle(temp[17]), System.Convert.ToSingle(temp[18]));

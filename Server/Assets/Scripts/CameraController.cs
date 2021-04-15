@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour
 
         //Debug.Log("Update:: eyeHeight: " + eyeHeight + " fov: " + fov + " position: " + transform.position);
         //Debug.Log("nearClipPlane: " + renderCam.GetComponent<Camera>().nearClipPlane + " rendercam.z" + renderCam.transform.position.z);
-        Debug.Log("dy3- Update:: CameraHeight: " + thisCam.orthographicSize * 2.0f + "; CameraWidth: " + thisCam.orthographicSize * 2.0f * thisCam.aspect);
+        //Debug.Log("dy3- Update:: CameraHeight: " + thisCam.orthographicSize * 2.0f + "; CameraWidth: " + thisCam.orthographicSize * 2.0f * thisCam.aspect);
         curCameraOrthSize = thisCam.orthographicSize;
         curCameraHeight = thisCam.orthographicSize * 2.0f;
         curCameraWidth = curCameraHeight * thisCam.aspect;
