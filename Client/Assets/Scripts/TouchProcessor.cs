@@ -121,29 +121,38 @@ public class TouchProcessor : MonoBehaviour
             {
                 sender.GetComponent<ClientController>().sendMessage();
                 sendTimer = 0.05f;
-            } else
+            }
+            else
             {
                 sendTimer -= Time.deltaTime;
             }
             isLocked = isPanning || isRotating;
-        } else if (charMode == 's')
+        }
+        else if (charMode == 's')
         {
             detectSelect();
-        } else if (charMode == '1')
+        }
+        else if (charMode == '1')
         {
             detectFilter1();
-        } else if (charMode == '2')
+        }
+        else if (charMode == '2')
         {
             detectFilter2();
-        } else if (charMode == 't')
+        }
+        else if (charMode == 't')
         {
             detectTetraSelect();
-        } else if (charMode == 'd')
+        }
+        else if (charMode == 'd')
         {
             detectDiamondSelect();
         }
-	}
-
+        else if (charMode == 'a')
+        {
+            detectAngleTetraSelect();
+        }
+    }
     private void detectDiamondSelect()
     {
         int cntValidTouch = 0;
@@ -177,6 +186,38 @@ public class TouchProcessor : MonoBehaviour
     }
 
     private void detectTetraSelect()
+    {
+        int cntValidTouch = 0;
+        tpTetraOrDiamSelect1 = tpTetraOrDiamSelect2 = Vector2.zero;
+        if (Input.touchCount > -1 && Input.touchCount < 3)
+        {
+            if (Input.touchCount == 1)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.position.y > 100 && touch.position.y < screenHeight - 100)
+                {
+                    tpTetraOrDiamSelect1 = touch.position;
+                    cntValidTouch = 1;
+                }
+            }
+            else if (Input.touchCount == 2)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                if (touch1.position.y > 100 && touch1.position.y < screenHeight - 100 &&
+                   touch2.position.y > 100 && touch2.position.y < screenHeight - 100)
+                {
+                    tpTetraOrDiamSelect1 = touch1.position;
+                    tpTetraOrDiamSelect2 = touch2.position;
+                    cntValidTouch = 2;
+                }
+            }
+        }
+        cntTetraOrDiamSelectingInClient = cntValidTouch;
+        sender.GetComponent<ClientController>().sendMessage();
+    }
+
+    private void detectAngleTetraSelect()
     {
         int cntValidTouch = 0;
         tpTetraOrDiamSelect1 = tpTetraOrDiamSelect2 = Vector2.zero;
@@ -440,6 +481,11 @@ public class TouchProcessor : MonoBehaviour
                 break;
             case 'p':
                 modeText.text = ("Mode: Selection P");
+                isClientFiltering = false; isClientSelecting = false;
+                zSlider.SetActive(false);
+                break;
+            case 'a':
+                modeText.text = "Mode: Selection A";
                 isClientFiltering = false; isClientSelecting = false;
                 zSlider.SetActive(false);
                 break;

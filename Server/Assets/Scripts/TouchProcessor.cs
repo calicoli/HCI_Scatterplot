@@ -93,6 +93,7 @@ public class TouchProcessor : MonoBehaviour
         selectP,
         selectT,
         selectD,
+        selectA
     }
 
     void Start()
@@ -170,6 +171,11 @@ public class TouchProcessor : MonoBehaviour
         else if (charMode == 't' && currentMode == Mode.selectT)
         {
             detectTetraSelect();
+
+        }
+        else if (charMode == 'a' && currentMode == Mode.selectA)
+        {
+            detectAngleTetraSelect();
 
         }
         else if (charMode == 'd' && currentMode == Mode.selectD)
@@ -294,6 +300,71 @@ public class TouchProcessor : MonoBehaviour
     }
 
     public void processClientTetraTouch(int cntClient, Vector2 tp1, Vector2 tp2)
+    {
+        cntSelectingInClient = cntClient;
+        tpSelectInClient1 = tp1;
+        tpSelectInClient2 = tp2;
+    }
+    #endregion
+
+    #region AngleTetraSelection
+    void detectAngleTetraSelect()
+    {
+        cntSelectingInServer = Input.touchCount;
+        //cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
+        if (cntSelectingInServer > 0
+            && cntSelectingInServer + cntSelectingInClient == 3)
+        {
+            if (cntSelectingInServer == 1)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.position.y > 400 && touch.position.y < screenHeight - 400)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessAngleTetraSelect(1,
+                        touch.position,
+                        tpSelectInClient1,
+                        tpSelectInClient2);
+
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+            }
+            else if (cntSelectingInServer == 2)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                if (touch1.position.y > 400 && touch1.position.y < screenHeight - 400 &&
+                   touch2.position.y > 400 && touch2.position.y < screenHeight - 400)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessAngleTetraSelect(2,
+                        touch1.position,
+                        touch2.position,
+                        tpSelectInClient1);
+                    //new Vector2(screenWidth - 150, screenHeight / 2 - 50));
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+
+            }
+            // only test
+            else if (cntSelectingInServer == 3)
+            {
+                Touch touch1 = Input.touches[0];
+                Touch touch2 = Input.touches[1];
+                Touch touch3 = Input.touches[2];
+                if (touch1.position.y > 400 && touch2.position.y > 400 && touch3.position.y > 400)
+                {
+                    selectProcessor.GetComponent<SelectProcessor>().
+                        ProcessAngleTetraSelect(3, touch1.position, touch2.position, touch3.position);
+                    selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+                }
+
+            }
+
+        }
+    }
+
+    public void processClientAngleTetraTouch(int cntClient, Vector2 tp1, Vector2 tp2)
     {
         cntSelectingInClient = cntClient;
         tpSelectInClient1 = tp1;
@@ -632,6 +703,21 @@ public class TouchProcessor : MonoBehaviour
         modeText.text = "Mode: Selection T";
         //!!!
         currentMode = Mode.selectT;
+        sender.GetComponent<ServerController>().sendMessage();
+
+        setIrrelevantOptionInactive();
+        cancelSelectButton.SetActive(true);
+        selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
+        selectProcessor.GetComponent<SelectProcessor>().showDiamond(false);
+        selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
+    }
+
+    public void enterSelectionAMode()
+    {
+        charMode = 'a';
+        modeText.text = "Mode: Selection A";
+        //!!!
+        currentMode = Mode.selectA;
         sender.GetComponent<ServerController>().sendMessage();
 
         setIrrelevantOptionInactive();

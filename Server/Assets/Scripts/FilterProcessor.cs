@@ -211,6 +211,22 @@ public class FilterProcessor : MonoBehaviour
             curzub = CountUpperValue(curzlb, curzub, zlb, zub);
             minRangeValue = curzlb;
             maxRangeValue = curzub;
+            // quad vertics
+            crzlb = CountLowerValue(crzlb, crzub, rtzlb, rtzub);
+            crzub = CountUpperValue(crzlb, crzub, rtzlb, rtzub);
+            Vector3[] var1 = {
+                new Vector3(rtxlb, rtylb, crzlb),
+                new Vector3(rtxlb, rtyub, crzlb),
+                new Vector3(rtxub, rtylb, crzlb),
+                new Vector3(rtxub, rtyub, crzlb)
+            };
+            Vector3[] var2 = {
+                new Vector3(rtxlb, rtylb, crzub),
+                new Vector3(rtxlb, rtyub, crzub),
+                new Vector3(rtxub, rtylb, crzub),
+                new Vector3(rtxub, rtyub, crzub)
+            };
+            arrQuad1 = var1; arrQuad2 = var2;
         }
         else {
             ch = '0';
@@ -230,8 +246,8 @@ public class FilterProcessor : MonoBehaviour
         else if (ch == 'x')
         {
             ballController.GetComponent<BallController>().UpdateBallWithRange(ch, minRangeValue, maxRangeValue);
-            filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('z', true, arrQuad1, arrQuad2);
-            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', true);
+            //filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('z', true, arrQuad1, arrQuad2);
+            //filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', true);
         }
         else
         {
@@ -293,6 +309,7 @@ public class FilterProcessor : MonoBehaviour
         
     }
 
+    // abondoned, need fix after axes rotation
     public void ProcessServerOneRange(Touch touch)
     {
         if (touch.phase == TouchPhase.Began)

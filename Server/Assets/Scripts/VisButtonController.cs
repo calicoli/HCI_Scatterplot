@@ -69,4 +69,10 @@ public class VisButtonController : MonoBehaviour
         touchProcessor.GetComponent<TouchProcessor>().enterSelectionDMode();
         ballController.GetComponent<BallController>().UpdateBallPosition();
     }
+
+    public void BtnSelectAngleTetraMode()
+    {
+        touchProcessor.GetComponent<TouchProcessor>().enterSelectionAMode();
+        ballController.GetComponent<BallController>().UpdateBallPosition();
+    }
 }
