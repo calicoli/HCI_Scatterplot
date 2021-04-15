@@ -103,17 +103,17 @@ public class FilterProcessor : MonoBehaviour
     // realtime position boundaries
     public void InitQuadBoundary(char axis, float minn, float maxx)
     {
-        if (axis == 'z')
+        if (axis == 'x')
         {
             crxlb = rtxlb = minn;
             crxub = rtxub = maxx;
         }
-        if (axis == 'y')
+        else if (axis == 'y')
         {
             crylb = rtylb = minn;
             cryub = rtyub = maxx;
         }
-        if (axis == 'x')
+        else if (axis == 'z')
         {
             crzlb = rtzlb = minn;
             crzub = rtzub = maxx;
@@ -145,6 +145,7 @@ public class FilterProcessor : MonoBehaviour
     void DeliverConvertedRangeValue()
     {
         char ch;
+        Vector3[] arrQuad1 = null, arrQuad2 = null;
         if (dirCurrent == slideDirection.leftright)
         {
             ch = 'z';
@@ -160,19 +161,19 @@ public class FilterProcessor : MonoBehaviour
             // quad vertics
             crxlb = CountLowerValue(crxlb, crxub, rtxlb, rtxub);
             crxub = CountUpperValue(crxlb, crxub, rtxlb, rtxub);
-            Vector3[] ver1 = {
+            Vector3[] var1 = {
                 new Vector3(crxlb, rtylb, rtzlb),
                 new Vector3(crxlb, rtylb, rtzub),
-                new Vector3(crxlb, rtyub, rtzub),
-                new Vector3(crxlb, rtyub, rtzlb)
+                new Vector3(crxlb, rtyub, rtzlb),
+                new Vector3(crxlb, rtyub, rtzub)
             };
-            Vector3[] ver2 = {
+            Vector3[] var2 = {
                 new Vector3(crxub, rtylb, rtzlb),
                 new Vector3(crxub, rtylb, rtzub),
-                new Vector3(crxub, rtyub, rtzub),
-                new Vector3(crxub, rtyub, rtzlb)
+                new Vector3(crxub, rtyub, rtzlb),
+                new Vector3(crxub, rtyub, rtzub)
             };
-            //filterVisulizer.GetComponent<FilterVisulizer>().updateQuad(true, ver1, ver2);
+            arrQuad1 = var1; arrQuad2 = var2;
         }
         else if (dirCurrent == slideDirection.updown)
         {
@@ -186,6 +187,22 @@ public class FilterProcessor : MonoBehaviour
             minySlider = CountLowerValue(minySlider, maxySlider, minSliderRange, maxSliderRange);
             maxySlider = CountUpperValue(minySlider, maxySlider, minSliderRange, maxSliderRange);
             UpdateYSlider(minySlider, maxSliderRange - maxySlider);
+            // quad vertics
+            crylb = CountLowerValue(crylb, cryub, rtylb, rtyub);
+            cryub = CountUpperValue(crylb, cryub, rtylb, rtyub);
+            Vector3[] var1 = {
+                new Vector3(rtxlb, crylb, rtzlb),
+                new Vector3(rtxlb, crylb, rtzub),
+                new Vector3(rtxub, crylb, rtzlb),
+                new Vector3(rtxub, crylb, rtzub)
+            };
+            Vector3[] var2 = {
+                new Vector3(rtxlb, cryub, rtzlb),
+                new Vector3(rtxlb, cryub, rtzub),
+                new Vector3(rtxub, cryub, rtzlb),
+                new Vector3(rtxub, cryub, rtzub)
+            };
+            arrQuad1 = var1; arrQuad2 = var2;
         }
         else if (dirCurrent == slideDirection.frontback)
         {
@@ -195,10 +212,32 @@ public class FilterProcessor : MonoBehaviour
             minRangeValue = curzlb;
             maxRangeValue = curzub;
         }
-        else { ch = '0'; }
-        if(ch == 'x' || ch =='y' || ch=='z')
+        else {
+            ch = '0';
+        }
+        if (ch == 'z')
         {
             ballController.GetComponent<BallController>().UpdateBallWithRange(ch, minRangeValue, maxRangeValue);
+            filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('x', true, arrQuad1, arrQuad2);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('x', true);
+        }
+        else if(ch == 'y')
+        {
+            ballController.GetComponent<BallController>().UpdateBallWithRange(ch, minRangeValue, maxRangeValue);
+            filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('y', true, arrQuad1, arrQuad2);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('y', true);
+        }
+        else if (ch == 'x')
+        {
+            ballController.GetComponent<BallController>().UpdateBallWithRange(ch, minRangeValue, maxRangeValue);
+            filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('z', true, arrQuad1, arrQuad2);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', true);
+        }
+        else
+        {
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('x', false);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('y', false);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', false);
         }
         
     }
@@ -240,6 +279,8 @@ public class FilterProcessor : MonoBehaviour
                 dirCurrent = slideDirection.frontback;
                 InitFilterBoundary('x', xlb, xub);
                 InitFilterBoundary('y', ylb, yub);
+                InitQuadBoundary('x', rtxlb, rtxub);
+                InitQuadBoundary('y', rtylb, rtyub);
                 lowerFilterDelta = minn;
                 upperFilterDelta = maxx;
             } else
@@ -272,12 +313,14 @@ public class FilterProcessor : MonoBehaviour
                     dirCurrent = slideDirection.leftright;
                     //InitSlider('y');
                     InitFilterBoundary('y', ylb, yub);
+                    //InitQuadBoundary('y', rtylb, rtyub);
                 }
                 else
                 {
                     dirCurrent = slideDirection.updown;
                     //InitSlider('x');
                     InitFilterBoundary('x', xlb, xub);
+                    //InitQuadBoundary('x', rtxlb, rtxub);
                 }
                 hadDirection = true;
             }
@@ -359,16 +402,17 @@ public class FilterProcessor : MonoBehaviour
                )
                 {
                     dirCurrent = slideDirection.leftright;
-                    //InitSlider('y');
                     InitFilterBoundary('y', ylb, yub);
+                    InitQuadBoundary('y', rtylb, rtyub);
+                    InitQuadBoundary('z', rtzlb, rtzub);
                 }
                 else
                 {
                     dirCurrent = slideDirection.updown;
-                    //InitSlider('x');
                     InitFilterBoundary('x', xlb, xub);
+                    InitQuadBoundary('x', rtxlb, rtxub);
+                    InitQuadBoundary('z', rtzlb, rtzub);
                 }
-                //Debug.Log("dy2- direction: " + dirCurrent);
                 hadDirection = true;
             }
 
@@ -416,7 +460,6 @@ public class FilterProcessor : MonoBehaviour
             }
             //if (Mathf.Abs(lowerFilterDelta) < minFilter2Ratio) lowerFilterDelta = 0f;
             //if (Mathf.Abs(upperFilterDelta) < minFilter2Ratio) upperFilterDelta = 0f;
-            //filterVisulizer.GetComponent<FilterVisulizer>().enableQuad(true);
 
         }
         else if (touch1.phase == TouchPhase.Ended || touch2.phase == TouchPhase.Ended)
@@ -424,7 +467,7 @@ public class FilterProcessor : MonoBehaviour
             isFilteringInServer = false;
             dirCurrent = slideDirection.nullDirection;
             hadDirection = false;
-            //filterVisulizer.GetComponent<FilterVisulizer>().enableQuad(false);
+            
         }
 
         DeliverConvertedRangeValue();

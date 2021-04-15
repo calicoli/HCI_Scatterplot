@@ -358,6 +358,7 @@ public class BallController : MonoBehaviour
         filterProcessor.GetComponent<FilterProcessor>().InitQuadBoundary('x', minx, maxx);
         filterProcessor.GetComponent<FilterProcessor>().InitQuadBoundary('y', miny, maxy);
         filterProcessor.GetComponent<FilterProcessor>().InitQuadBoundary('z', minz, maxz);
+
         /*
         filterProcessor.GetComponent<FilterProcessor>().InitFilterBoundary('x', minx, maxx);
         filterProcessor.GetComponent<FilterProcessor>().InitFilterBoundary('y', miny, maxy);
