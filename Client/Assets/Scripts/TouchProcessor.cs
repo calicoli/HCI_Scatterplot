@@ -153,7 +153,7 @@ public class TouchProcessor : MonoBehaviour
             if (Input.touchCount == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 400 && touch.position.y < screenHeight - 400)
+                if (touch.position.y > 100 && touch.position.y < screenHeight - 100)
                 {
                     tpTetraOrDiamSelect1 = touch.position;
                     cntValidTouch = 1;
@@ -163,8 +163,8 @@ public class TouchProcessor : MonoBehaviour
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if (touch1.position.y > 400 && touch1.position.y < screenHeight - 400 &&
-                   touch2.position.y > 400 && touch2.position.y < screenHeight - 400)
+                if (touch1.position.y > 100 && touch1.position.y < screenHeight - 100 &&
+                   touch2.position.y > 100 && touch2.position.y < screenHeight - 100)
                 {
                     tpTetraOrDiamSelect1 = touch1.position;
                     tpTetraOrDiamSelect2 = touch2.position;
@@ -185,7 +185,7 @@ public class TouchProcessor : MonoBehaviour
             if (Input.touchCount == 1)
             {
                 Touch touch = Input.touches[0];
-                if (touch.position.y > 400 && touch.position.y < screenHeight - 400)
+                if (touch.position.y > 100 && touch.position.y < screenHeight - 100)
                 {
                     tpTetraOrDiamSelect1 = touch.position;
                     cntValidTouch = 1;
@@ -195,8 +195,8 @@ public class TouchProcessor : MonoBehaviour
             {
                 Touch touch1 = Input.touches[0];
                 Touch touch2 = Input.touches[1];
-                if (touch1.position.y > 400 && touch1.position.y < screenHeight - 400 &&
-                   touch2.position.y > 400 && touch2.position.y < screenHeight - 400)
+                if (touch1.position.y > 100 && touch1.position.y < screenHeight - 100 &&
+                   touch2.position.y > 100 && touch2.position.y < screenHeight - 100)
                 {
                     tpTetraOrDiamSelect1 = touch1.position;
                     tpTetraOrDiamSelect2 = touch2.position;

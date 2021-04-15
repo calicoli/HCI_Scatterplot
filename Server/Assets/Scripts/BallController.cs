@@ -290,8 +290,9 @@ public class BallController : MonoBehaviour
             balls[i].isSelected = false;
             balls[i].isFiltered = false;
             balls[i].oriPosition = pointContainer.transform.GetChild(i).transform.localPosition;
+            balls[i].oriPosition.z = -balls[i].oriPosition.z;
             balls[i].showPosition = new Vector3(
-                -balls[i].oriPosition.z,
+                balls[i].oriPosition.z,
                 balls[i].oriPosition.y,
                 balls[i].oriPosition.x);
             //balls[i].bound = pointContainer.transform.GetChild(i).GetComponent<MeshFilter>().mesh.bounds;

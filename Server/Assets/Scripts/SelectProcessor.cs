@@ -19,6 +19,7 @@ public class SelectProcessor : MonoBehaviour
     private LineRenderer lrLine;
     private const float lineWidth = 0.1f;
 
+    public bool curTetraStatus;
     public GameObject tetraContainer;
     private GameObject[] triTetra = new GameObject[4];
     private MeshRenderer[] mrTetra = new MeshRenderer[4];
@@ -28,6 +29,7 @@ public class SelectProcessor : MonoBehaviour
     private Bounds boundTetra;
     private bool ballEnableInteractScript;
 
+    public bool curDiamondStatus;
     public GameObject diamondContainer;
     private GameObject quadDiamond;
     private MeshRenderer mrDiamond;
@@ -446,6 +448,7 @@ public class SelectProcessor : MonoBehaviour
         {
             pointText.text = null;
         }
+        curDiamondStatus = flag;
     }
 
     public void showTetra(bool flag)
@@ -462,6 +465,7 @@ public class SelectProcessor : MonoBehaviour
         {
             pointText.text = null;
         }
+        curTetraStatus = flag;
     }
 
     public void DetectRaycastOnBallwithNewRaycast(int num, Vector2 v1, Vector2 v2)

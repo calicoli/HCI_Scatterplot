@@ -41,6 +41,9 @@ public class FilterProcessor : MonoBehaviour
 
     private float screenWidth, screenHeight;
 
+    public GameObject objOrigin, objXEnd, objYEnd, objZEnd;
+    private Vector3 posOrigin, posXEnd, posYEnd, posZEnd;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,6 +59,16 @@ public class FilterProcessor : MonoBehaviour
         maxxSlider = maxySlider = minzSlider = maxSliderRange;
 
         hadDirection = false;
+
+        updateAnchorPosition();
+    }
+
+    void updateAnchorPosition()
+    {
+        posOrigin = objOrigin.transform.position;
+        posXEnd = objXEnd.transform.position;
+        posYEnd = objYEnd.transform.position;
+        posZEnd = objZEnd.transform.position;
     }
 
     // Update is called once per frame
@@ -66,7 +79,7 @@ public class FilterProcessor : MonoBehaviour
     // original position boundaries
     public void InitFilterBoundary(char axis, float minn, float maxx)
     {
-        if (axis == 'x')
+        if (axis == 'z')
         {
             InitSlider('x');
             xlb = minn; curxlb = minn;
@@ -78,7 +91,7 @@ public class FilterProcessor : MonoBehaviour
             ylb = minn; curylb = minn;
             yub = maxx; curyub = maxx;
         }
-        if(axis == 'z')
+        if(axis == 'x')
         {
             InitSlider('z');
             zlb = minn; curzlb = minn;
@@ -90,7 +103,7 @@ public class FilterProcessor : MonoBehaviour
     // realtime position boundaries
     public void InitQuadBoundary(char axis, float minn, float maxx)
     {
-        if (axis == 'x')
+        if (axis == 'z')
         {
             crxlb = rtxlb = minn;
             crxub = rtxub = maxx;
@@ -100,7 +113,7 @@ public class FilterProcessor : MonoBehaviour
             crylb = rtylb = minn;
             cryub = rtyub = maxx;
         }
-        if (axis == 'z')
+        if (axis == 'x')
         {
             crzlb = rtzlb = minn;
             crzub = rtzub = maxx;
@@ -108,7 +121,7 @@ public class FilterProcessor : MonoBehaviour
     }
     public void InitSlider(char axis)
     {
-        if(axis == 'x')
+        if(axis == 'z')
         {
             minxSlider = minSliderRange;
             maxxSlider = maxSliderRange;
@@ -121,7 +134,7 @@ public class FilterProcessor : MonoBehaviour
             UpdateYSlider(minySlider, maxSliderRange - maxySlider);
         }
         // z donot need here
-        if(axis == 'z')
+        if(axis == 'x')
         {
             minzSlider = minSliderRange;
             maxzSlider = maxSliderRange;
@@ -134,7 +147,7 @@ public class FilterProcessor : MonoBehaviour
         char ch;
         if (dirCurrent == slideDirection.leftright)
         {
-            ch = 'x';
+            ch = 'z';
             // ball range
             curxlb = CountLowerValue(curxlb, curxub, xlb, xub);
             curxub = CountUpperValue(curxlb, curxub, xlb, xub);
@@ -176,7 +189,7 @@ public class FilterProcessor : MonoBehaviour
         }
         else if (dirCurrent == slideDirection.frontback)
         {
-            ch = 'z';
+            ch = 'x';
             curzlb = CountLowerValue(curzlb, curzub, zlb, zub);
             curzub = CountUpperValue(curzlb, curzub, zlb, zub);
             minRangeValue = curzlb;

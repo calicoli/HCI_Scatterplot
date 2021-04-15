@@ -637,6 +637,8 @@ public class TouchProcessor : MonoBehaviour
         setIrrelevantOptionInactive();
         cancelSelectButton.SetActive(true);
         selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
+        selectProcessor.GetComponent<SelectProcessor>().showDiamond(false);
+        selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
     }
 
     public void enterSelectionDMode()
@@ -650,6 +652,8 @@ public class TouchProcessor : MonoBehaviour
         setIrrelevantOptionInactive();
         cancelSelectButton.SetActive(true);
         selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
+        selectProcessor.GetComponent<SelectProcessor>().showDiamond(false);
+        selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
     }
 
     public void enterNavigationMode()
@@ -665,8 +669,7 @@ public class TouchProcessor : MonoBehaviour
         GameObject pa = this.transform.parent.gameObject;
         GameObject lt = pa.transform.Find("LeanTouch").gameObject;
         lt.SetActive(true);
-        selectProcessor.GetComponent<SelectProcessor>().showDiamond(true);
-        selectProcessor.GetComponent<SelectProcessor>().showTetra(true);
+
     }
 
     void setIrrelevantOptionInactive()
@@ -679,8 +682,7 @@ public class TouchProcessor : MonoBehaviour
         xSlider.SetActive(false);
         ySlider.SetActive(false);
         ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
-        selectProcessor.GetComponent<SelectProcessor>().showDiamond(false);
-        selectProcessor.GetComponent<SelectProcessor>().showTetra(false);
+
     }
     #endregion
 }

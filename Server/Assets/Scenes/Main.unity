@@ -3181,7 +3181,7 @@ Transform:
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_Children: []
   m_Father: {fileID: 1913795724}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &853571819 stripped
 GameObject:
@@ -4830,7 +4830,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1913795724}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1356240723
 BoxCollider:
@@ -6979,6 +6979,7 @@ Transform:
   - {fileID: 9077547792052313929}
   - {fileID: 1830964917}
   - {fileID: 1411657935}
+  - {fileID: 1994039602}
   - {fileID: 1356240722}
   - {fileID: 769233016}
   m_Father: {fileID: 1280463432}
@@ -7204,7 +7205,9 @@ MonoBehaviour:
   frameThisDevice: {fileID: 732281694}
   frameOtherDevice: {fileID: 1020034786}
   testCube: {fileID: 1831997200}
+  curTetraStatus: 0
   tetraContainer: {fileID: 1830964916}
+  curDiamondStatus: 0
   diamondContainer: {fileID: 1411657934}
   objOrigin: {fileID: 255001513}
   objXEnd: {fileID: 1435803849}
@@ -7370,14 +7373,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994039601}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -5.1111116, y: 0, z: 0}
+  m_LocalScale: {x: 2.2222219, y: 2.2222223, z: 2.2222219}
   m_Children:
   - {fileID: 1837211303}
   - {fileID: 1976228295}
-  m_Father: {fileID: 2098901007}
-  m_RootOrder: 0
+  m_Father: {fileID: 1913795724}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1994039603
 MonoBehaviour:
@@ -7618,8 +7621,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1994039602}
+  m_Children: []
   m_Father: {fileID: 185229517}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7642,6 +7644,10 @@ MonoBehaviour:
   filterVisulizer: {fileID: 1994039601}
   isFilteringInServer: 0
   isFilteringInClient: 0
+  objOrigin: {fileID: 255001513}
+  objXEnd: {fileID: 1435803849}
+  objYEnd: {fileID: 6141675}
+  objZEnd: {fileID: 1669114056}
 --- !u!4 &150651465417953292
 Transform:
   m_ObjectHideFlags: 0
