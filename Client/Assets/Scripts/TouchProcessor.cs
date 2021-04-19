@@ -117,6 +117,7 @@ public class TouchProcessor : MonoBehaviour
             calculate();
             freemoving();
 
+            /*
             if (sendTimer < 0)
             {
                 sender.GetComponent<ClientController>().sendMessage();
@@ -125,7 +126,7 @@ public class TouchProcessor : MonoBehaviour
             else
             {
                 sendTimer -= Time.deltaTime;
-            }
+            }*/
             isLocked = isPanning || isRotating;
         }
         else if (charMode == 's')
@@ -349,13 +350,15 @@ public class TouchProcessor : MonoBehaviour
 			pos += panDelta;
             isPanning = true;
             panTimer = panDelay;
-		}
+            sender.GetComponent<ClientController>().sendMessage();
+        }
 
         if (rotateDelta.magnitude > minRotateAngle)
         {
             rot *= Quaternion.Euler(rotateDelta);
             isRotating = true;
             rotateTimer = panDelay;
+            sender.GetComponent<ClientController>().sendMessage();
         }
 
         isPanning = (panTimer > 0);

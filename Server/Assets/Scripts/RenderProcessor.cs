@@ -6,14 +6,24 @@ public class RenderProcessor : MonoBehaviour
 {
     // quad vars
     private Vector3[] normalsQuad = {
-                -Vector3.forward, -Vector3.forward,
-                -Vector3.forward, -Vector3.forward
+                Vector3.forward, Vector3.forward,
+                Vector3.forward, Vector3.forward
             };
     private Vector2[] uvsQuad = {
                 new Vector2(0, 0), -new Vector2(1, 0),
                 new Vector2(1, 1), new Vector2(0, 1)
             };
-    private int[] indicesQuad = new int[6] { 0, 1, 2, 1, 2, 3 };
+    //private int[] indicesQuad = new int[6] { 0, 1, 2, 1, 2, 3 };
+    private int[] indicesQuad = new int[6] { 0, 1, 2, 1, 3, 2 };
+
+    // double-quad vars
+    //private int[] indicesDoubleQuad = new int[] { 0, 1, 2, 2, 3, 0, 4, 7, 6, 6, 5, 4 };
+    private int[] indicesDoubleQuad = new int[] {   0, 1, 2, 1, 3, 2,
+                                                    4, 6, 5, 5, 6, 7 };
+    private Vector2[] uvsDoubleQuad = new Vector2[] {
+        Vector2.zero, new Vector2(0, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 0),//正面
+        new Vector2(0.5f, 0), new Vector2(0.5f, 1),Vector2.one, new Vector2(1, 0)  //反面
+        };
 
     // triangle vars
     private Vector3[] normalsTri = {
@@ -80,6 +90,25 @@ public class RenderProcessor : MonoBehaviour
             mesh.normals = normalsQuad;
             mesh.uv = uvsQuad;
             mesh.triangles = indicesQuad;
+            outMesh = mesh;
+        }
+        else
+        {
+            outMesh = mesh;
+        }
+    }
+
+    public void updateDoubleQuad(bool flag, Vector3[] vertices,
+        out Mesh outMesh)
+    {
+        Mesh mesh = new Mesh();
+        if (flag)
+        {
+            Debug.Log("dy6- len: " + vertices.Length);
+            mesh.vertices = vertices;
+            //mesh.normals = normalsQuad;
+            mesh.uv = uvsDoubleQuad;
+            mesh.triangles = indicesDoubleQuad;
             outMesh = mesh;
         }
         else

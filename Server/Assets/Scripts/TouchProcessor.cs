@@ -10,6 +10,7 @@ public class TouchProcessor : MonoBehaviour
     public Text modeText;
     public GameObject cancelSelectButton;
     public GameObject cancelFilterButton;
+    public GameObject cancelAidshapeButton;
     public GameObject xSlider, ySlider;
 
     public GameObject orthCamera;
@@ -19,6 +20,7 @@ public class TouchProcessor : MonoBehaviour
     public GameObject filterProcessor;
     public GameObject selectProcessor;
     public Text pointText;
+    public GameObject snapProcessor;
 
     private NaviPhase nPhase;
     private float sendTimer = -1;
@@ -93,7 +95,9 @@ public class TouchProcessor : MonoBehaviour
         selectP,
         selectT,
         selectD,
-        selectA
+        selectA,
+        selectF,
+        focus
     }
 
     void Start()
@@ -183,6 +187,28 @@ public class TouchProcessor : MonoBehaviour
             detectDiamondSelect();
 
         }
+        else if (charMode == 'f' && currentMode == Mode.selectF)
+        {
+            detectFaceSelect();
+        }
+        else if (charMode == 'o' && currentMode == Mode.focus)
+        {
+            snapProcessor.GetComponent<SnapProcessor>().focus();
+        }
+    }
+
+    void detectFaceSelect()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            snapProcessor.GetComponent<SnapProcessor>().
+                ProcessFaceSelect(Input.mousePosition);
+        } else if(Input.touchCount == 1)
+        {
+            snapProcessor.GetComponent<SnapProcessor>().
+                ProcessFaceSelect(Input.touches[0].position);
+        }
+        
     }
 
     #region DiamondSelection
@@ -657,8 +683,6 @@ public class TouchProcessor : MonoBehaviour
         charMode = '1';
         modeText.text = "Mode: Filtering 1";
         currentMode = Mode.filter1;
-        //modeFilter1 = true;
-        //modeNavigate = modeSelect = modeFilter2 = false;
         sender.GetComponent<ServerController>().sendMessage();
 
 
@@ -673,8 +697,6 @@ public class TouchProcessor : MonoBehaviour
         charMode = '2';
         modeText.text = "Mode: Filtering 2";
         currentMode = Mode.filter2;
-        //modeFilter2 = true;
-        //modeNavigate = modeSelect = modeFilter1 = false;
         sender.GetComponent<ServerController>().sendMessage();
 
         setIrrelevantOptionInactive();
@@ -683,14 +705,50 @@ public class TouchProcessor : MonoBehaviour
         ySlider.SetActive(true);
     }
 
+    public void enterFocusMode()
+    {
+        charMode = 'o';
+        modeText.text = "Mode: Focus";
+        currentMode = Mode.focus;
+        sender.GetComponent<ServerController>().sendMessage();
+
+        setIrrelevantOptionInactive();
+        selectProcessor.GetComponent<SelectProcessor>().resetPublicParams();
+    }
+
+    public void enterSelectionPMode(char ch)
+    {
+        if(ch == 'f')
+        {
+            charMode = 'f';
+            modeText.text = "Mode: Face Selection";
+            currentMode = Mode.selectF;
+        }
+        else if(ch == 'p')
+        {
+            charMode = 'p';
+            modeText.text = "Mode: Point Selection";
+            currentMode = Mode.selectP;
+        }
+        sender.GetComponent<ServerController>().sendMessage();
+
+        setIrrelevantOptionInactive();
+        cancelSelectButton.SetActive(true);
+    }
+
     public void enterSelectionPMode()
     {
-        charMode = 'p';
-        modeText.text = "Mode: Selection P";
-        //!!!
-        currentMode = Mode.selectP;
-        //modeSelect = true;
-        //modeNavigate = modeFilter1 = modeFilter2 = false;
+        if (charMode == 'p' && currentMode == Mode.selectP)
+        {
+            charMode = 'f';
+            modeText.text = "Mode: Face Selection";
+            currentMode = Mode.selectF;
+        } else
+        {
+            charMode = 'p';
+            modeText.text = "Mode: Point Selection";
+            currentMode = Mode.selectP;
+        }
         sender.GetComponent<ServerController>().sendMessage();
 
         setIrrelevantOptionInactive();
@@ -700,8 +758,7 @@ public class TouchProcessor : MonoBehaviour
     public void enterSelectionTMode()
     {
         charMode = 't';
-        modeText.text = "Mode: Selection T";
-        //!!!
+        modeText.text = "Mode: T Selection";
         currentMode = Mode.selectT;
         sender.GetComponent<ServerController>().sendMessage();
 
@@ -715,8 +772,7 @@ public class TouchProcessor : MonoBehaviour
     public void enterSelectionAMode()
     {
         charMode = 'a';
-        modeText.text = "Mode: Selection A";
-        //!!!
+        modeText.text = "Mode: A Selection";
         currentMode = Mode.selectA;
         sender.GetComponent<ServerController>().sendMessage();
 
@@ -730,8 +786,7 @@ public class TouchProcessor : MonoBehaviour
     public void enterSelectionDMode()
     {
         charMode = 'd';
-        modeText.text = "Mode: Selection D";
-        //!!!
+        modeText.text = "Mode: D Selection";
         currentMode = Mode.selectD;
         sender.GetComponent<ServerController>().sendMessage();
 
@@ -747,8 +802,6 @@ public class TouchProcessor : MonoBehaviour
         charMode = 'n';
         modeText.text = "Mode: Navigation";
         currentMode = Mode.navigate;
-        //modeNavigate = true;
-        //modeFilter1 = modeFilter2 = modeSelect = false;
         sender.GetComponent<ServerController>().sendMessage();
 
         setIrrelevantOptionInactive();
@@ -768,7 +821,11 @@ public class TouchProcessor : MonoBehaviour
         xSlider.SetActive(false);
         ySlider.SetActive(false);
         ballController.GetComponent<BallController>().UpdateInteractBallScript(false);
+    }
 
+    public void clearAidshape()
+    {
+        snapProcessor.GetComponent<SnapProcessor>().clearHighlight();
     }
     #endregion
 }

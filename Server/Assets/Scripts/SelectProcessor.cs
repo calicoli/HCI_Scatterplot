@@ -398,7 +398,7 @@ public class SelectProcessor : MonoBehaviour
     void RedrawDiamond(int cntServer, Vector3 p1, Vector3 p2, Vector3 p3)
     {
         Vector3 p4 = Vector3.zero;
-        Vector3[] varr = new Vector3[4];
+        Vector3[] varr = new Vector3[8];
         // calculate the P4 position 
         if (cntServer == 1)
         {
@@ -406,11 +406,13 @@ public class SelectProcessor : MonoBehaviour
             if(Mathf.Abs(p2.y - p1.y) < Mathf.Abs(p3.y - p1.y))
             {
                 p4 = p3 + p1 - p2;
-                Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+                //Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+                Vector3[] temp = { p2, p1, p3, p4, p2, p1, p3, p4 }; varr = temp;
             } else
             {
                 p4 = p2 + p1 - p3;
-                Vector3[] temp = { p3, p2, p1, p4 }; varr = temp;
+                //Vector3[] temp = { p3, p2, p1, p4 }; varr = temp;
+                Vector3[] temp = { p3, p2, p1, p4, p3, p2, p1, p4 }; varr = temp;
             }
             // calculate normal of diamond
             if(p2.y > p3.y)
@@ -428,11 +430,13 @@ public class SelectProcessor : MonoBehaviour
             if(Mathf.Abs(p1.y - p3.y) < Mathf.Abs(p2.y - p3.y))
             {
                 p4 = p2 + p3 - p1;
-                Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+                //Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+                Vector3[] temp = { p1, p2, p3, p4, p1, p2, p3, p4 }; varr = temp;
             } else
             {
                 p4 = p1 + p3 - p2;
-                Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+                //Vector3[] temp = { p2, p1, p3, p4 }; varr = temp;
+                Vector3[] temp = { p2, p1, p3, p4, p2, p1, p3, p4 }; varr = temp;
             }
             if(p1.y > p2.y)
             {
@@ -447,14 +451,17 @@ public class SelectProcessor : MonoBehaviour
         } else if(cntServer == 3)
         {
             p4 = p2 + p3 - p1;
-            Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+            //Vector3[] temp = { p1, p2, p3, p4 }; varr = temp;
+            Vector3[] temp = { p1, p2, p3, p4, p1, p2, p3, p4 }; varr = temp;
             normalDiamond = Vector3.Cross(p1 - p2, p1 - p3);
         }
         
         Mesh mesh = new Mesh();
-        renderProcessor.GetComponent<RenderProcessor>().updateQuad(true, varr, out mesh);
+        //renderProcessor.GetComponent<RenderProcessor>().updateQuad(true, varr, out mesh);
+        renderProcessor.GetComponent<RenderProcessor>().updateDoubleQuad(true, varr, out mesh);
         mesh.name = "diamond-quad";
         mfDiamond.mesh = mesh;
+        mfDiamond.gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     void RedrawTetraEdge(Vector3 p1, Vector3 p2, Vector3 p3)
