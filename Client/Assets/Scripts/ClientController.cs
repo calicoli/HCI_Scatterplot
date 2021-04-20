@@ -110,7 +110,7 @@ public class ClientController : MonoBehaviour {
             tpTDselect1.x + "," + tpTDselect1.y + "," + tpTDselect2.x + "," + tpTDselect2.y + ","
             ;
         Debug.Log("dy3-2 lowerFilterDelta: " +
-            touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "upper: " +
+            touchProcessor.GetComponent<TouchProcessor>().lowerFilterDelta + "; upper: " +
             touchProcessor.GetComponent<TouchProcessor>().upperFilterDelta);
         try
         {

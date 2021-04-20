@@ -20,8 +20,15 @@ public class VisButtonController : MonoBehaviour
     }
 
     public void BtnCancelSelection()
-    {
-        ballController.GetComponent<BallController>().ResetBallColorInSelection();
+    {   
+        if (touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectF)
+        {
+            touchProcessor.GetComponent<TouchProcessor>().clearAidshape();
+        }
+        else
+        {
+            ballController.GetComponent<BallController>().ResetBallColorInSelection();
+        }
     }
 
     public void BtnCancelFiltering()
@@ -39,11 +46,11 @@ public class VisButtonController : MonoBehaviour
     {
         touchProcessor.GetComponent<TouchProcessor>().enterNavigationMode();
     }
-
-    public void BtnSelectPointMode()
+    
+    public void BtnFocus()
     {
-        touchProcessor.GetComponent<TouchProcessor>().enterSelectionPMode();
-        ballController.GetComponent<BallController>().UpdateBallPosition();
+        touchProcessor.GetComponent<TouchProcessor>().enterFocusMode();
+        //ballController.GetComponent<BallController>().UpdateBallPosition();
     }
 
     public void BtnFilter1Mode()
@@ -55,6 +62,12 @@ public class VisButtonController : MonoBehaviour
     public void BtnFilter2Mode()
     {
         touchProcessor.GetComponent<TouchProcessor>().enterFiltering2Mode();
+        ballController.GetComponent<BallController>().UpdateBallPosition();
+    }
+
+    public void BtnSelectPointMode()
+    {
+        touchProcessor.GetComponent<TouchProcessor>().enterSelectionPMode();
         ballController.GetComponent<BallController>().UpdateBallPosition();
     }
 

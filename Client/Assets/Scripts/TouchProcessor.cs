@@ -117,6 +117,7 @@ public class TouchProcessor : MonoBehaviour
             calculate();
             freemoving();
 
+            /*
             if (sendTimer < 0)
             {
                 sender.GetComponent<ClientController>().sendMessage();
@@ -125,7 +126,7 @@ public class TouchProcessor : MonoBehaviour
             else
             {
                 sendTimer -= Time.deltaTime;
-            }
+            }*/
             isLocked = isPanning || isRotating;
         }
         else if (charMode == 's')
@@ -295,7 +296,7 @@ public class TouchProcessor : MonoBehaviour
                 upperFilterDelta = 0f;
             }
             sender.GetComponent<ClientController>().sendMessage();
-            Debug.Log("dy3-1 lowerFilterDelta: " + lowerFilterDelta + "upper: " + upperFilterDelta);
+            Debug.Log("dy3-1 lowerFilterDelta: " + lowerFilterDelta + "; upper: " + upperFilterDelta);
         } else
         {
             //filterProcessor.GetComponent<FilterProcessor>().isFilteringInServer = isServerFiltering;
@@ -349,13 +350,15 @@ public class TouchProcessor : MonoBehaviour
 			pos += panDelta;
             isPanning = true;
             panTimer = panDelay;
-		}
+            sender.GetComponent<ClientController>().sendMessage();
+        }
 
         if (rotateDelta.magnitude > minRotateAngle)
         {
             rot *= Quaternion.Euler(rotateDelta);
             isRotating = true;
             rotateTimer = panDelay;
+            sender.GetComponent<ClientController>().sendMessage();
         }
 
         isPanning = (panTimer > 0);
@@ -455,7 +458,6 @@ public class TouchProcessor : MonoBehaviour
 
     public void switchtoServerMode(char ch)
     {
-        Debug.Log("dy-current mode: " + ch);
         charMode = ch;
         switch (ch)
         {
@@ -507,6 +509,5 @@ public class TouchProcessor : MonoBehaviour
                 zSlider.SetActive(false);
                 break;
         }
-        Debug.Log("dy-mode text: " + modeText.text);
     }
 }
