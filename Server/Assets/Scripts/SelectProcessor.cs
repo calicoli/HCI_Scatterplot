@@ -65,6 +65,19 @@ public class SelectProcessor : MonoBehaviour
         updateAnchorPosition();
     }
 
+    public void updateTetraConvexProperty(bool flag)
+    {
+        if(flag)
+        {
+            tetraContainer.GetComponent<MeshCollider>().convex = true;
+            tetraContainer.GetComponent<MeshCollider>().isTrigger = true;
+        } else
+        {
+            tetraContainer.GetComponent<MeshCollider>().isTrigger = false;
+            tetraContainer.GetComponent<MeshCollider>().convex = false;
+        }
+    }
+
     void updateAnchorPosition()
     {
         posOrigin = objOrigin.transform.position;
