@@ -165,6 +165,7 @@ public class TouchProcessor : MonoBehaviour
         }
         else if (charMode == 't' && currentMode == Mode.selectT)
         {
+            // here tetra must be a convex-trigger;
             detectTetraSelect();
 
         }
@@ -180,6 +181,7 @@ public class TouchProcessor : MonoBehaviour
         }
         else if (charMode == 'f' && currentMode == Mode.selectF)
         {
+            // here tetra must be a non-convex;
             detectFaceSelect();
         }
         else if (charMode == 'o' && currentMode == Mode.focus)
@@ -190,7 +192,8 @@ public class TouchProcessor : MonoBehaviour
 
     void detectFaceSelect()
     {
-        if(Input.GetMouseButtonDown(0))
+        selectProcessor.GetComponent<SelectProcessor>().updateTetraConvexProperty(false);
+        if (Input.GetMouseButtonDown(0))
         {
             snapProcessor.GetComponent<SnapProcessor>().
                 ProcessFaceSelect(Input.mousePosition);
@@ -260,6 +263,7 @@ public class TouchProcessor : MonoBehaviour
     #region TetraSelection
     void detectTetraSelect()
     {
+        selectProcessor.GetComponent<SelectProcessor>().updateTetraConvexProperty(true);
         cntSelectingInServer = Input.touchCount;
         //cntTetraSelectingInClient = 3 - cntTetraSelectingInServer;
         if(cntSelectingInServer > 0
