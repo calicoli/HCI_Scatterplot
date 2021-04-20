@@ -36,6 +36,8 @@ public class TouchProcessor : MonoBehaviour
     public bool isFilteringInServer, isFilteringInClient;
     private float minFilterInClient, maxFilterInClient;
     [HideInInspector]
+    public bool infoResetZSlider;
+    [HideInInspector]
     public Vector3 vertex1, vertex2;
     [HideInInspector]
     public int cntSelectingInServer, cntSelectingInClient;
@@ -118,6 +120,7 @@ public class TouchProcessor : MonoBehaviour
         currentMode = Mode.navigate;
         existSelection = false;
         isFilteringInServer = isFilteringInClient = false;
+        infoResetZSlider = false;
         cntSelectingInServer = cntSelectingInClient = 0;
     }
 
@@ -150,7 +153,7 @@ public class TouchProcessor : MonoBehaviour
         {
             detectFilter2();
             sender.GetComponent<ServerController>().sendMessage();
-            debugText.text = "filtering s/c: " + isFilteringInServer.ToString() + "/" + isFilteringInClient.ToString();
+            //debugText.text = "filtering s/c: " + isFilteringInServer.ToString() + "/" + isFilteringInClient.ToString();
         }
         else if (charMode == 'r' && currentMode == Mode.selectR)
         {
@@ -502,6 +505,7 @@ public class TouchProcessor : MonoBehaviour
             
         } else
         {
+            filterProcessor.GetComponent<FilterProcessor>().    DisableParamsInCase();
             isFilteringInServer = false;
             filterProcessor.GetComponent<FilterProcessor>().
                     ProcessClientRange(isFilteringInClient, minFilterInClient, maxFilterInClient);
@@ -532,10 +536,14 @@ public class TouchProcessor : MonoBehaviour
 
     public void resetZSliderFromServer()
     {
+        /*
         bool tmp = isFilteringInServer;
         isFilteringInServer = true;
         sender.GetComponent<ServerController>().sendMessage();
         isFilteringInServer = tmp;
+        */
+        infoResetZSlider = true;
+        sender.GetComponent<ServerController>().sendMessage();
     }
     #endregion
 

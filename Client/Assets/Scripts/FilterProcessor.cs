@@ -129,8 +129,6 @@ public class FilterProcessor : MonoBehaviour
             if (!hadDirection)
             {
                 dirCurrent = slideDirection.frontback;
-                //InitSlider('z');
-                //InitFilterBoundary('z', zlb, zub);
                 hadDirection = true;
             }
 
@@ -166,6 +164,7 @@ public class FilterProcessor : MonoBehaviour
             dirCurrent = slideDirection.nullDirection;
             hadDirection = false;
         }
+        Debug.Log("dy6- direction: " + dirCurrent.ToString());
         DeliverConvertedRangeValue();
     }
 

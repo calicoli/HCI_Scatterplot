@@ -100,8 +100,6 @@ public class FilterProcessor : MonoBehaviour
             InitSlider('z');
             zlb = minn; curzlb = minn;
             zub = maxx; curzub = maxx;
-            // send message to client
-            touchProcessor.GetComponent<TouchProcessor>().resetZSliderFromServer();
         }
     }
     // realtime position boundaries
@@ -125,7 +123,7 @@ public class FilterProcessor : MonoBehaviour
     }
     public void InitSlider(char axis)
     {
-        if(axis == 'z')
+        if(axis == 'x')
         {
             minxSlider = minSliderRange;
             maxxSlider = maxSliderRange;
@@ -138,13 +136,14 @@ public class FilterProcessor : MonoBehaviour
             UpdateYSlider(minySlider, maxSliderRange - maxySlider);
         }
         // z donot need here
-        if(axis == 'x')
+        if(axis == 'z')
         {
             /*
             minzSlider = minSliderRange;
             maxzSlider = maxSliderRange;
             // send message to client
             */
+            touchProcessor.GetComponent<TouchProcessor>().resetZSliderFromServer();
         }
     }
 
@@ -263,7 +262,20 @@ public class FilterProcessor : MonoBehaviour
             filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('y', false);
             filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', false);
         }
-        
+        debugText.text = ch + " axis. " + 
+            "(" + curxlb.ToString("f1") + ", " + curxub.ToString("f1") + ") " +
+            "(" + curylb.ToString("f1") + ", " + curyub.ToString("f1") + ") " +
+            "(" + curzlb.ToString("f1") + ", " + curzub.ToString("f1") + ") ";
+    }
+
+    public void DisableParamsInCase()
+    {
+        isFilteringInServer = false;
+        dirCurrent = slideDirection.nullDirection;
+        hadDirection = false;
+        filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('x', false);
+        filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('y', false);
+        filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', false);
     }
     float CountLowerValue(float cl, float cu, float lowerbound, float upperbound)
     {
@@ -302,7 +314,7 @@ public class FilterProcessor : MonoBehaviour
                 hadDirection = true;
                 dirCurrent = slideDirection.frontback;
                 InitFilterBoundary('y', ylb, yub);
-                InitFilterBoundary('z', zlb, zub);
+                InitFilterBoundary('z', xlb, xub);
                 InitQuadBoundary('x', rtxlb, rtxub);
                 InitQuadBoundary('y', rtylb, rtyub);
                 lowerFilterDelta = minn;
@@ -427,7 +439,7 @@ public class FilterProcessor : MonoBehaviour
                )
                 {
                     dirCurrent = slideDirection.leftright;
-                    InitFilterBoundary('x', xlb, xub);
+                    InitFilterBoundary('x', zlb, zub);
                     InitFilterBoundary('y', ylb, yub);
                     InitQuadBoundary('y', rtylb, rtyub);
                     InitQuadBoundary('z', rtzlb, rtzub);
@@ -435,8 +447,8 @@ public class FilterProcessor : MonoBehaviour
                 else
                 {
                     dirCurrent = slideDirection.updown;
-                    InitFilterBoundary('x', xlb, xub);
-                    InitFilterBoundary('z', zlb, zub);
+                    InitFilterBoundary('z', xlb, xub);
+                    InitFilterBoundary('x', zlb, zub);
                     InitQuadBoundary('x', rtxlb, rtxub);
                     InitQuadBoundary('z', rtzlb, rtzub);
                 }
