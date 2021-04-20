@@ -1648,6 +1648,7 @@ MonoBehaviour:
   existSelection: 0
   isFilteringInServer: 0
   isFilteringInClient: 0
+  infoResetZSlider: 0
   vertex1: {x: 0, y: 0, z: 0}
   vertex2: {x: 0, y: 0, z: 0}
   cntSelectingInServer: 0

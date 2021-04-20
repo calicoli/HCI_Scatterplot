@@ -152,6 +152,7 @@ public class ClientController : MonoBehaviour {
         string[] temp = rcvMsg.Split(',');
         char serverMode = temp[10][0];
         bool serverFiltering = (temp[11][0] == 'T') ? true : false;
+        Debug.Log("dy6- server filtering: " + serverFiltering);
         if (serverMode == 'n' || serverMode == '2' || serverMode == 's')
         {
             //touchProcessor.GetComponent<TouchProcessor>().isSelecting = false;

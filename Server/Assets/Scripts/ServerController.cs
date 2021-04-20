@@ -85,7 +85,8 @@ public class ServerController : MonoBehaviour {
         Quaternion tr = touchProcessor.GetComponent<TouchProcessor>().rot;
         Vector3 ts = touchProcessor.GetComponent<TouchProcessor>().sca;
         char tCharMode = touchProcessor.GetComponent<TouchProcessor>().charMode;
-        bool tisServerFiltering = touchProcessor.GetComponent<TouchProcessor>().isFilteringInServer;
+        bool tisServerFiltering =   touchProcessor.GetComponent<TouchProcessor>().isFilteringInServer ||
+                                    touchProcessor.GetComponent<TouchProcessor>().infoResetZSlider;
         if (connectedTcpClient == null) {
 			return;
 		}
@@ -103,7 +104,9 @@ public class ServerController : MonoBehaviour {
 				byte[] serverMessageAsByteArray = Encoding.ASCII.GetBytes(serverMessage);
 				stream.Write(serverMessageAsByteArray, 0, serverMessageAsByteArray.Length);
 				Debug.Log("Server sent his message - should be received by client");
-			}
+                if (touchProcessor.GetComponent<TouchProcessor>().infoResetZSlider)
+                    touchProcessor.GetComponent<TouchProcessor>().infoResetZSlider = false;
+            }
 		}
 		catch (SocketException socketException) {
 			Debug.Log("Socket exception: " + socketException);
