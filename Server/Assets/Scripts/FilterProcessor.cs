@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FilterProcessor : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class FilterProcessor : MonoBehaviour
     public GameObject ballController;
     public GameObject touchProcessor;
     public GameObject filterVisulizer;
+
+    public Text debugText;
 
     [HideInInspector]
     public bool isFilteringInServer;
@@ -31,8 +34,8 @@ public class FilterProcessor : MonoBehaviour
     private float curxlb, curylb, curzlb, curxub, curyub, curzub;
     private float minRangeValue, maxRangeValue;
     // value for slider
-    private float minxSlider, minySlider, minzSlider,
-                  maxxSlider, maxySlider, maxzSlider;
+    private float minxSlider, minySlider,
+                  maxxSlider, maxySlider;
     private const float minSliderRange = 0f, maxSliderRange = 10f;
 
     // values for ball with realtime positions
@@ -55,8 +58,8 @@ public class FilterProcessor : MonoBehaviour
         posStart1 = posStart2 = posCurrent1 = posCurrent2 = Vector3.zero;
         lowerFilterDelta = upperFilterDelta = 0f;
 
-        minxSlider = minySlider = minzSlider = minSliderRange;
-        maxxSlider = maxySlider = minzSlider = maxSliderRange;
+        minxSlider = minySlider = minSliderRange;
+        maxxSlider = maxySlider = maxSliderRange;
 
         hadDirection = false;
 
@@ -75,6 +78,7 @@ public class FilterProcessor : MonoBehaviour
     void Update()
     {
         //DeliverConvertedRangeValue();
+
     }
     // original position boundaries
     public void InitFilterBoundary(char axis, float minn, float maxx)
@@ -136,9 +140,11 @@ public class FilterProcessor : MonoBehaviour
         // z donot need here
         if(axis == 'x')
         {
+            /*
             minzSlider = minSliderRange;
             maxzSlider = maxSliderRange;
             // send message to client
+            */
         }
     }
 
@@ -207,6 +213,7 @@ public class FilterProcessor : MonoBehaviour
         else if (dirCurrent == slideDirection.frontback)
         {
             ch = 'x';
+            // ball range
             curzlb = CountLowerValue(curzlb, curzub, zlb, zub);
             curzub = CountUpperValue(curzlb, curzub, zlb, zub);
             minRangeValue = curzlb;
@@ -245,9 +252,10 @@ public class FilterProcessor : MonoBehaviour
         }
         else if (ch == 'x')
         {
+            // client filter
             ballController.GetComponent<BallController>().UpdateBallWithRange(ch, minRangeValue, maxRangeValue);
-            //filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('z', true, arrQuad1, arrQuad2);
-            //filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', true);
+            filterVisulizer.GetComponent<FilterVisulizer>().updateQuad('z', true, arrQuad1, arrQuad2);
+            filterVisulizer.GetComponent<FilterVisulizer>().enableQuad('z', true);
         }
         else
         {
@@ -284,7 +292,7 @@ public class FilterProcessor : MonoBehaviour
         yslider.GetComponent<Michsky.UI.ModernUIPack.RangeSlider>().maxSlider.Refresh(maxx);
     }
 
-    public void ProcessorClientRange(bool clientFiltering, float minn, float maxx)
+    public void ProcessClientRange(bool clientFiltering, float minn, float maxx)
     {
         if(!isFilteringInServer)
         {
@@ -293,8 +301,8 @@ public class FilterProcessor : MonoBehaviour
             {
                 hadDirection = true;
                 dirCurrent = slideDirection.frontback;
-                InitFilterBoundary('x', xlb, xub);
                 InitFilterBoundary('y', ylb, yub);
+                InitFilterBoundary('z', zlb, zub);
                 InitQuadBoundary('x', rtxlb, rtxub);
                 InitQuadBoundary('y', rtylb, rtyub);
                 lowerFilterDelta = minn;
@@ -419,6 +427,7 @@ public class FilterProcessor : MonoBehaviour
                )
                 {
                     dirCurrent = slideDirection.leftright;
+                    InitFilterBoundary('x', xlb, xub);
                     InitFilterBoundary('y', ylb, yub);
                     InitQuadBoundary('y', rtylb, rtyub);
                     InitQuadBoundary('z', rtzlb, rtzub);
@@ -427,6 +436,7 @@ public class FilterProcessor : MonoBehaviour
                 {
                     dirCurrent = slideDirection.updown;
                     InitFilterBoundary('x', xlb, xub);
+                    InitFilterBoundary('z', zlb, zub);
                     InitQuadBoundary('x', rtxlb, rtxub);
                     InitQuadBoundary('z', rtzlb, rtzub);
                 }
@@ -484,7 +494,6 @@ public class FilterProcessor : MonoBehaviour
             isFilteringInServer = false;
             dirCurrent = slideDirection.nullDirection;
             hadDirection = false;
-            
         }
 
         DeliverConvertedRangeValue();

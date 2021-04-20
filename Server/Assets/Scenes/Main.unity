@@ -1628,6 +1628,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e0cd9220d76b41c6b69b16fad7f3d0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugText: {fileID: 1486587756}
   sender: {fileID: 892375413}
   obj: {fileID: 1280463431}
   modeText: {fileID: 1278240725}
@@ -6167,7 +6168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1486587755
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8499,6 +8500,7 @@ MonoBehaviour:
   ballController: {fileID: 1511578557}
   touchProcessor: {fileID: 371470039}
   filterVisulizer: {fileID: 1994039601}
+  debugText: {fileID: 1486587756}
   isFilteringInServer: 0
   isFilteringInClient: 0
   objOrigin: {fileID: 255001513}

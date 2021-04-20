@@ -154,11 +154,12 @@ public class ServerController : MonoBehaviour {
         if (touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.filter1 ||
             touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.filter2)
         {
-            bool clientFiltering = temp[13][0] == 'T' ? true : false;
+            bool clientFiltering = (temp[13][0] == 'T') ? true : false;
             float minn = System.Convert.ToSingle(temp[14]);
             float maxx = System.Convert.ToSingle(temp[15]);
-            filterProcessor.GetComponent<FilterProcessor>().ProcessorClientRange(
-                clientFiltering, minn, maxx);
+            //filterProcessor.GetComponent<FilterProcessor>().ProcessorClientRange(
+            //    clientFiltering, minn, maxx);
+            touchProcessor.GetComponent<TouchProcessor>().processClientFilterRange(clientFiltering, minn, maxx);
         }
         if (touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectT ||
             touchProcessor.GetComponent<TouchProcessor>().getCurrentMode() == TouchProcessor.Mode.selectD ||

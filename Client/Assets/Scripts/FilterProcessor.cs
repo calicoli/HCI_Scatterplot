@@ -117,8 +117,6 @@ public class FilterProcessor : MonoBehaviour
             posStart2 = touch2.position;
             dirCurrent = slideDirection.nullDirection;
             hadDirection = false;
-            //lowerFilterDelta = 0f;
-            //upperFilterDelta = 0f;
         }
         else if (touch1.phase == TouchPhase.Moved || touch2.phase == TouchPhase.Moved)
         {
